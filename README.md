@@ -6,9 +6,9 @@ Build, validate, and submit mini apps for the [Plotpaper](https://plotpaper.com)
 
 | Package | Description |
 |---------|-------------|
-| [`@plotpaper/types`](./packages/types) | TypeScript type definitions for the SDK |
-| [`@plotpaper/cli`](./packages/cli) | CLI for validating, bundling, and submitting apps |
-| [`@plotpaper/dev-harness`](./packages/dev-harness) | Local Expo app for testing mini apps with hot reload |
+| [`@plotpaper/core`](./packages/core) | Shared validation rules, schema validators, and bundler utilities |
+| [`@plotpaper/mini-app-sdk`](./packages/mini-app-sdk) | Runtime SDK — `usePlotpaperSDK()` hook, navigation components, types |
+| [`@plotpaper/cli`](./packages/cli) | CLI for scaffolding, validating, bundling, and submitting apps |
 
 ## Quick Start
 
@@ -16,18 +16,21 @@ Build, validate, and submit mini apps for the [Plotpaper](https://plotpaper.com)
 # Install the CLI
 npm install -g @plotpaper/cli
 
-# Create your app (App.tsx + schema.json)
-# See examples/ for reference
+# Scaffold a new mini app
+plotpaper init my-app --template todo
+
+# Start dev mode (watch + validate + bundle on save)
+plotpaper dev my-app/App.tsx
 
 # Validate
-plotpaper-cli validate ./my-app/App.tsx
+plotpaper validate my-app/App.tsx
 
-# Bundle (for inspection)
-plotpaper-cli bundle ./my-app/App.tsx
+# Bundle
+plotpaper bundle my-app/App.tsx
 
 # Submit to Plotpaper
-plotpaper-cli config set-key <your-api-key>
-plotpaper-cli submit ./my-app/App.tsx --name "My App"
+plotpaper login
+plotpaper submit my-app/App.tsx --name "My App"
 ```
 
 ## What is a Plotpaper Mini App?
@@ -41,11 +44,56 @@ A single-file React Native component that runs inside the Plotpaper platform. Ea
 - **Notifications** — schedule daily or one-time notifications
 - **Multiplayer** — space-scoped data for shared app experiences
 
+## CLI Commands
+
+| Command | Description |
+|---------|-------------|
+| `plotpaper init [dir]` | Scaffold a new mini app (`--template blank\|todo`) |
+| `plotpaper dev <file>` | Watch with live validation and bundling |
+| `plotpaper validate <file>` | Check source against all rules |
+| `plotpaper bundle <file>` | Compile source to an IIFE bundle |
+| `plotpaper submit <file>` | Submit to the Plotpaper platform |
+| `plotpaper login` | Authenticate with your Plotpaper email |
+| `plotpaper config set-key <key>` | Set API key (alternative auth) |
+
+## Writing a Mini App
+
+```tsx
+import React, { useState } from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { usePlotpaperSDK } from "@plotpaper/mini-app-sdk";
+
+export default function App() {
+  const sdk = usePlotpaperSDK();
+  const colors = sdk.theme.colors;
+  const [count, setCount] = useState(0);
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={{ color: colors.foreground, fontSize: 24 }}>
+        Count: {count}
+      </Text>
+      <Pressable
+        style={[styles.button, { backgroundColor: colors.primary }]}
+        onPress={() => setCount((c) => c + 1)}
+      >
+        <Text style={{ color: colors.primaryForeground }}>Increment</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  button: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, marginTop: 16 },
+});
+```
+
 ## Constraints
 
 - Single file, single default export
-- Max 50KB source code
-- Only allowed imports: `react`, `react-native`, `@plotpaper/mini-app-sdk`, `@expo/vector-icons/Feather`, `react-native-svg`, `react-native-safe-area-context`
+- Max 50KB source, 150KB bundle
+- Allowed imports: `react`, `react-native`, `@plotpaper/mini-app-sdk`, `@expo/vector-icons/Feather`, `react-native-svg`, `react-native-safe-area-context`
 - No network requests (`fetch`, `XMLHttpRequest`)
 - No native module access
 
@@ -69,6 +117,19 @@ See [Security Model](./docs/security-model.md) for full details.
 - [Habit Tracker](./examples/habit-tracker) — feed actions, SVG progress ring
 - [Quiz Game](./examples/quiz-game) — AI-generated content, credits
 - [Multiplayer Poll](./examples/multiplayer-poll) — multiplayer, voting
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Build all packages
+npm run build
+
+# Run tests
+npm test
+```
 
 ## Contributing
 
