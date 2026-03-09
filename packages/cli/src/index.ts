@@ -6,14 +6,35 @@ import { Command } from "commander";
 import { runValidate } from "./commands/validate";
 import { runBundle } from "./commands/bundle";
 import { runSubmit } from "./commands/submit";
+import { runInit } from "./commands/init";
+import { runDev } from "./commands/dev";
 import { saveConfig } from "./utils/config";
 
 const program = new Command();
 
 program
-  .name("plotpaper-cli")
+  .name("plotpaper")
   .description("CLI for building and submitting Plotpaper mini apps")
   .version("0.1.0");
+
+// ── init ──────────────────────────────────────────────────────────────
+program
+  .command("init [directory]")
+  .description("Create a new mini app project")
+  .option("-t, --template <template>", "Template to use (blank, todo)", "blank")
+  .action(async (dir: string | undefined, options: { template?: string }) => {
+    await runInit(dir || ".", options);
+  });
+
+// ── dev ───────────────────────────────────────────────────────────────
+program
+  .command("dev <file>")
+  .description("Watch a mini app source file with live validation and bundling")
+  .option("-s, --schema <path>", "Path to schema.json file")
+  .option("-o, --output <path>", "Output bundle path")
+  .action(async (file: string, options: { schema?: string; output?: string }) => {
+    await runDev(file, options);
+  });
 
 // ── validate ────────────────────────────────────────────────────────────
 program

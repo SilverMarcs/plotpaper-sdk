@@ -1,35 +1,49 @@
 // =============================================================================
-// esbuild Transform Step
+// esbuild Build Step — replaces transform + regex rewrite with a proper
+// bundler pass that uses the plotpaper plugin for module resolution.
 // =============================================================================
 
-import * as esbuild from "esbuild-wasm";
-
-let esbuildReady = false;
-
-async function ensureEsbuild(): Promise<void> {
-  if (!esbuildReady) {
-    await esbuild.initialize({ worker: false });
-    esbuildReady = true;
-  }
-}
+import * as esbuild from "esbuild";
+import { plotpaperModulesPlugin } from "./plugin";
 
 /**
- * Transpile source code using esbuild:
- * - JSX → React.createElement
- * - async/await → generators
- * - Target ES2016 (Hermes compatible)
+ * Bundle source code using esbuild with the plotpaper modules plugin.
+ *
+ * This replaces the old pipeline of:
+ *   esbuild.transform → stripComments → regexRewriteImports
+ *
+ * esbuild handles JSX, import resolution (via plugin), tree-shaking,
+ * and comment removal as a proper AST-level operation.
  */
-export async function transformSource(source: string): Promise<string> {
-  await ensureEsbuild();
-
-  const result = await esbuild.transform(source, {
-    loader: "tsx",
+export async function buildSource(
+  source: string,
+  resolveDir?: string,
+): Promise<{ code: string; defaultExportName: string }> {
+  const result = await esbuild.build({
+    stdin: {
+      contents: source,
+      loader: "tsx",
+      resolveDir: resolveDir || process.cwd(),
+    },
+    bundle: true,
+    write: false,
+    format: "iife",
+    globalName: "__ppExport",
+    target: "es2016",
     jsx: "transform",
     jsxFactory: "React.createElement",
     jsxFragment: "React.Fragment",
-    target: "es2016",
     charset: "utf8",
+    plugins: [plotpaperModulesPlugin()],
+    logLevel: "silent",
   });
 
-  return result.code;
+  if (result.errors.length > 0) {
+    const messages = result.errors.map((e) => e.text).join("\n");
+    throw new Error(`Build failed:\n${messages}`);
+  }
+
+  const code = result.outputFiles![0].text;
+
+  return { code, defaultExportName: "__ppExport" };
 }

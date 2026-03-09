@@ -46,7 +46,7 @@ export async function runBundle(filePath: string, options: BundleOptions): Promi
   const bundleId = options.bundleId || crypto.randomUUID();
 
   try {
-    const bundled = await bundle(source, bundleId);
+    const bundled = await bundle(source, bundleId, path.dirname(resolved));
 
     // Validate bundle size
     const bundleCheck = validateBundle(bundled);

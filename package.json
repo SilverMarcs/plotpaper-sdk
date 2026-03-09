@@ -8,6 +8,8 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "build:sdk": "npm run build -w packages/mini-app-sdk",
-    "build:cli": "npm run build -w packages/cli"
+    "build:cli": "npm run build -w packages/cli",
+    "test": "npm run test -w packages/cli",
+    "test:watch": "npm run test:watch -w packages/cli"
   }
 }

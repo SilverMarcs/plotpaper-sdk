@@ -1,18 +1,21 @@
 // =============================================================================
-// IIFE Wrapping
+// IIFE Wrapping — takes esbuild's IIFE output and adds mini app registration
 // =============================================================================
 
 /**
- * Wrap rewritten code in a self-executing function that:
- * 1. Sets up module registry access (__m = globalThis.__ppModules)
- * 2. Registers the default export on globalThis.__ppMiniApps[bundleId]
+ * Wrap esbuild's IIFE output with the mini app registration code.
+ *
+ * esbuild's IIFE output looks like:
+ *   var __ppExport = (() => { ... })();
+ *
+ * We wrap it so the default export gets registered on __ppMiniApps.
  */
-export function wrapInIIFE(code: string, bundleId: string, defaultExportName: string): string {
-  return `(function(){
-"use strict";
-var __m=globalThis.__ppModules;
-${code}
-globalThis.__ppMiniApps=globalThis.__ppMiniApps||{};
-globalThis.__ppMiniApps[${JSON.stringify(bundleId)}]=${defaultExportName};
-})();`;
+export function wrapBundle(esbuildOutput: string, bundleId: string): string {
+  return (
+    `(function(){\n"use strict";\n` +
+    esbuildOutput +
+    `\nglobalThis.__ppMiniApps=globalThis.__ppMiniApps||{};\n` +
+    `globalThis.__ppMiniApps[${JSON.stringify(bundleId)}]=__ppExport.default;\n` +
+    `})();`
+  );
 }
