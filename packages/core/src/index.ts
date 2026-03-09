@@ -18,6 +18,10 @@ export {
 } from "./schema";
 export type { SchemaInput, PermissionsInput } from "./schema";
 
+// Manifest
+export { ManifestZ, validateManifest } from "./manifest";
+export type { Manifest } from "./manifest";
+
 // Bundler utilities
 export { plotpaperModulesPlugin } from "./plugin";
 export { wrapBundle } from "./wrap";

@@ -13,7 +13,7 @@ describe("bundle", () => {
     `;
     const result = await bundle(source, "test-id");
     expect(result).toContain("__ppMiniApps");
-    expect(result).toContain('"test-id"');
+    expect(result).toContain("test-id");
     expect(result).toContain("__ppExport");
   });
 
@@ -143,20 +143,30 @@ describe("bundle", () => {
 });
 
 describe("wrapBundle", () => {
-  it("wraps code in IIFE with registration", () => {
+  it("wraps code in IIFE with registration and sdkVersion", () => {
     const code = 'var __ppExport = (() => { return { default: function() {} }; })();';
     const result = wrapBundle(code, "wrap-test");
     expect(result).toMatch(/^\(function\(\)\{/);
     expect(result).toContain('"use strict"');
     expect(result).toContain("__ppMiniApps");
-    expect(result).toContain('"wrap-test"');
+    expect(result).toContain("wrap-test");
+    expect(result).toContain("component");
     expect(result).toContain("__ppExport.default");
+    expect(result).toContain("sdkVersion");
     expect(result).toMatch(/\}\)\(\);$/);
   });
 
   it("escapes special characters in bundle ID", () => {
     const code = "var __ppExport = {};";
-    const result = wrapBundle(code, 'test"id');
-    expect(result).toContain('test\\"id');
+    const result = wrapBundle(code, "test'id");
+    expect(result).toContain("test\\'id");
+  });
+
+  it("includes sdkVersion in the registration object", () => {
+    const code = "var __ppExport = { default: function() {} };";
+    const result = wrapBundle(code, "sdk-v-test");
+    // Should register an object with component and sdkVersion, not just the component
+    expect(result).toContain("component:__ppExport.default");
+    expect(result).toMatch(/sdkVersion:'[0-9]+\.[0-9]+\.[0-9]+'/);
   });
 });

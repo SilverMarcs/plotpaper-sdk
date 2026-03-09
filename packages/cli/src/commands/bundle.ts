@@ -6,8 +6,9 @@ import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
 import chalk from "chalk";
-import { validateSource, validateBundle } from "../validation";
+import { validateSource, validateProject, validateBundle } from "../validation";
 import { bundle } from "../bundler";
+import { validateManifest, type Manifest } from "@plotpaper/core";
 
 export interface BundleOptions {
   output?: string;
@@ -15,38 +16,68 @@ export interface BundleOptions {
   schema?: string;
 }
 
-export async function runBundle(filePath: string, options: BundleOptions): Promise<void> {
-  const resolved = path.resolve(filePath);
+export async function runBundle(target: string, options: BundleOptions): Promise<void> {
+  const resolved = path.resolve(target);
 
   if (!fs.existsSync(resolved)) {
-    console.error(chalk.red(`File not found: ${resolved}`));
+    console.error(chalk.red(`Not found: ${resolved}`));
     process.exit(1);
   }
 
-  const source = fs.readFileSync(resolved, "utf-8");
+  const stat = fs.statSync(resolved);
+  let source: string;
+  let resolveDir: string;
+  let displayName: string;
+  let outputBaseName: string;
+  let manifest: Manifest | undefined;
 
-  // Validate first
-  console.log();
-  console.log(chalk.bold(`Bundling ${path.basename(resolved)}`));
-
-  const validation = validateSource(source, {
-    filePath: resolved,
-    schemaPath: options.schema,
-  });
-  if (!validation.valid) {
-    console.log(chalk.red.bold(`\n  Validation failed:`));
-    for (const err of validation.errors) {
-      console.log(chalk.red(`  ✗ ${err}`));
+  if (stat.isDirectory()) {
+    // Project directory — read manifest
+    const projectResult = validateProject(resolved);
+    if (!projectResult.valid) {
+      console.log(chalk.red.bold(`\n  Validation failed:`));
+      for (const err of projectResult.errors) {
+        console.log(chalk.red(`  ✗ ${err}`));
+      }
+      console.log(chalk.dim(`\n  Run 'plotpaper validate ${target}' for details.`));
+      process.exit(1);
     }
-    console.log(chalk.dim(`\n  Run 'plotpaper validate ${filePath}' for details.`));
-    process.exit(1);
+
+    manifest = projectResult.manifest!;
+    source = fs.readFileSync(projectResult.entryPath!, "utf-8");
+    resolveDir = resolved;
+    displayName = `${manifest.name} (${path.basename(resolved)}/)`;
+    outputBaseName = manifest.name.replace(/[^a-zA-Z0-9_-]/g, "-");
+  } else {
+    // Single file — backward compat
+    source = fs.readFileSync(resolved, "utf-8");
+
+    const validation = validateSource(source, {
+      filePath: resolved,
+      schemaPath: options.schema,
+    });
+    if (!validation.valid) {
+      console.log(chalk.red.bold(`\n  Validation failed:`));
+      for (const err of validation.errors) {
+        console.log(chalk.red(`  ✗ ${err}`));
+      }
+      console.log(chalk.dim(`\n  Run 'plotpaper validate ${target}' for details.`));
+      process.exit(1);
+    }
+
+    resolveDir = path.dirname(resolved);
+    displayName = path.basename(resolved);
+    outputBaseName = path.basename(resolved, path.extname(resolved));
   }
+
+  console.log();
+  console.log(chalk.bold(`Bundling ${displayName}`));
 
   // Generate bundle ID if not provided
   const bundleId = options.bundleId || crypto.randomUUID();
 
   try {
-    const bundled = await bundle(source, bundleId, path.dirname(resolved));
+    const bundled = await bundle(source, bundleId, resolveDir);
 
     // Validate bundle size
     const bundleCheck = validateBundle(bundled);
@@ -58,7 +89,9 @@ export async function runBundle(filePath: string, options: BundleOptions): Promi
     // Write output
     const outputPath = options.output
       ? path.resolve(options.output)
-      : resolved.replace(/\.tsx?$/, ".bundle.js");
+      : stat.isDirectory()
+        ? path.join(resolved, `${outputBaseName}.bundle.js`)
+        : resolved.replace(/\.tsx?$/, ".bundle.js");
 
     fs.writeFileSync(outputPath, bundled, "utf-8");
 

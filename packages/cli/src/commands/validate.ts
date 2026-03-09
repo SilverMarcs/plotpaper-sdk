@@ -5,28 +5,48 @@
 import * as fs from "fs";
 import * as path from "path";
 import chalk from "chalk";
-import { validateSource } from "../validation";
+import { validateSource, validateProject } from "../validation";
+import type { ValidationResult, ProjectValidationResult } from "../validation";
 
 export interface ValidateOptions {
   schema?: string;
 }
 
-export async function runValidate(filePath: string, options?: ValidateOptions): Promise<void> {
-  const resolved = path.resolve(filePath);
+export async function runValidate(target: string, options?: ValidateOptions): Promise<void> {
+  const resolved = path.resolve(target);
 
   if (!fs.existsSync(resolved)) {
-    console.error(chalk.red(`File not found: ${resolved}`));
+    console.error(chalk.red(`Not found: ${resolved}`));
     process.exit(1);
   }
 
-  const source = fs.readFileSync(resolved, "utf-8");
-  const result = validateSource(source, {
-    filePath: resolved,
-    schemaPath: options?.schema,
-  });
+  const stat = fs.statSync(resolved);
+  let result: ValidationResult | ProjectValidationResult;
+  let displayName: string;
+  let source: string;
+
+  if (stat.isDirectory()) {
+    // Project directory — read manifest
+    const projectResult = validateProject(resolved);
+    result = projectResult;
+    displayName = projectResult.manifest
+      ? `${projectResult.manifest.name} (${path.basename(resolved)}/)`
+      : path.basename(resolved) + "/";
+    source = projectResult.entryPath && fs.existsSync(projectResult.entryPath)
+      ? fs.readFileSync(projectResult.entryPath, "utf-8")
+      : "";
+  } else {
+    // Single file — backward compat
+    source = fs.readFileSync(resolved, "utf-8");
+    result = validateSource(source, {
+      filePath: resolved,
+      schemaPath: options?.schema,
+    });
+    displayName = path.basename(resolved);
+  }
 
   console.log();
-  console.log(chalk.bold(`Validating ${path.basename(resolved)}`));
+  console.log(chalk.bold(`Validating ${displayName}`));
   console.log();
 
   if (result.errors.length > 0) {
@@ -60,7 +80,9 @@ export async function runValidate(filePath: string, options?: ValidateOptions): 
   }
 
   if (result.valid) {
-    const sizeKB = (Buffer.byteLength(source, "utf-8") / 1024).toFixed(1);
+    const sizeKB = source
+      ? (Buffer.byteLength(source, "utf-8") / 1024).toFixed(1)
+      : "0";
     console.log(chalk.green.bold(`  ✓ Valid`) + chalk.dim(` (${sizeKB} KB)`));
   } else {
     console.log(chalk.red.bold(`  ✗ Invalid`));

@@ -44,8 +44,12 @@ const styles = StyleSheet.create({
 `;
 
 const BLANK_SCHEMA = `{
-  "entities": []
+  "entities": [],
+  "links": []
 }
+`;
+
+const BLANK_PERMISSIONS = `[]
 `;
 
 const TODO_APP = `import React, { useState } from "react";
@@ -180,6 +184,19 @@ const TODO_SCHEMA = `{
 }
 `;
 
+const TODO_PERMISSIONS = `[
+  {
+    "entity": "todos",
+    "allow": {
+      "view": "auth.id != null",
+      "create": "auth.id != null",
+      "update": "auth.id != null",
+      "delete": "auth.id != null"
+    }
+  }
+]
+`;
+
 const TSCONFIG = `{
   "compilerOptions": {
     "target": "ES2020",
@@ -189,16 +206,36 @@ const TSCONFIG = `{
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@plotpaper/mini-app-sdk": ["./node_modules/@plotpaper/mini-app-sdk"]
+    }
   },
-  "include": ["*.tsx"]
+  "include": ["*.tsx", "*.ts"]
 }
 `;
 
-const TEMPLATES: Record<string, { app: string; schema: string; description: string }> = {
-  blank: { app: BLANK_APP, schema: BLANK_SCHEMA, description: "Empty app with counter" },
-  todo: { app: TODO_APP, schema: TODO_SCHEMA, description: "Todo list with database" },
+interface TemplateConfig {
+  app: string;
+  schema: string;
+  permissions: string;
+  description: string;
+}
+
+const TEMPLATES: Record<string, TemplateConfig> = {
+  blank: { app: BLANK_APP, schema: BLANK_SCHEMA, permissions: BLANK_PERMISSIONS, description: "Empty app with counter" },
+  todo: { app: TODO_APP, schema: TODO_SCHEMA, permissions: TODO_PERMISSIONS, description: "Todo list with database" },
 };
+
+function makeManifest(name: string, template: string): string {
+  const manifest: Record<string, unknown> = {
+    name,
+    entry: "App.tsx",
+    sdkVersion: "0.1.0",
+    mode: "private",
+  };
+  return JSON.stringify(manifest, null, 2) + "\n";
+}
 
 export async function runInit(dir: string, options: InitOptions): Promise<void> {
   const template = options.template || "blank";
@@ -215,9 +252,11 @@ export async function runInit(dir: string, options: InitOptions): Promise<void> 
   // Check if directory already has files
   if (fs.existsSync(targetDir)) {
     const existing = fs.readdirSync(targetDir);
-    const hasConflicts = existing.some((f) => ["App.tsx", "schema.json", "tsconfig.json"].includes(f));
+    const hasConflicts = existing.some((f) =>
+      ["plotpaper.json", "App.tsx", "schema.json", "permissions.json", "tsconfig.json"].includes(f),
+    );
     if (hasConflicts) {
-      console.error(chalk.red(`\n  Directory already contains App.tsx, schema.json, or tsconfig.json`));
+      console.error(chalk.red(`\n  Directory already contains project files (plotpaper.json, App.tsx, etc.)`));
       console.error(chalk.dim(`  Choose a different directory or remove existing files.`));
       process.exit(1);
     }
@@ -225,9 +264,14 @@ export async function runInit(dir: string, options: InitOptions): Promise<void> 
     fs.mkdirSync(targetDir, { recursive: true });
   }
 
+  // Derive project name from directory name
+  const projectName = path.basename(targetDir);
+
   // Write files
+  fs.writeFileSync(path.join(targetDir, "plotpaper.json"), makeManifest(projectName, template));
   fs.writeFileSync(path.join(targetDir, "App.tsx"), tmpl.app);
   fs.writeFileSync(path.join(targetDir, "schema.json"), tmpl.schema);
+  fs.writeFileSync(path.join(targetDir, "permissions.json"), tmpl.permissions);
   fs.writeFileSync(path.join(targetDir, "tsconfig.json"), TSCONFIG);
 
   const relDir = path.relative(process.cwd(), targetDir) || ".";
@@ -236,13 +280,15 @@ export async function runInit(dir: string, options: InitOptions): Promise<void> 
   console.log(chalk.green.bold(`  ✓ Created mini app (${template} template)`));
   console.log();
   console.log(chalk.dim(`  ${relDir}/`));
-  console.log(chalk.dim(`    App.tsx        — your mini app`));
-  console.log(chalk.dim(`    schema.json    — database schema`));
-  console.log(chalk.dim(`    tsconfig.json  — TypeScript config`));
+  console.log(chalk.dim(`    plotpaper.json    — project manifest`));
+  console.log(chalk.dim(`    App.tsx           — your mini app`));
+  console.log(chalk.dim(`    schema.json       — database schema`));
+  console.log(chalk.dim(`    permissions.json  — access permissions`));
+  console.log(chalk.dim(`    tsconfig.json     — TypeScript config`));
   console.log();
   console.log(chalk.bold(`  Next steps:`));
-  console.log(chalk.dim(`    plotpaper dev ${relDir}/App.tsx       — start dev mode`));
-  console.log(chalk.dim(`    plotpaper validate ${relDir}/App.tsx  — check for errors`));
-  console.log(chalk.dim(`    plotpaper bundle ${relDir}/App.tsx    — create bundle`));
-  console.log(chalk.dim(`    plotpaper submit ${relDir}/App.tsx    — submit to Plotpaper`));
+  console.log(chalk.dim(`    plotpaper dev ${relDir}       — start dev mode`));
+  console.log(chalk.dim(`    plotpaper validate ${relDir}  — check for errors`));
+  console.log(chalk.dim(`    plotpaper bundle ${relDir}    — create bundle`));
+  console.log(chalk.dim(`    plotpaper submit ${relDir}    — submit to Plotpaper`));
 }

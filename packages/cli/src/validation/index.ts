@@ -2,11 +2,15 @@
 // Source Validation — runs all checks on mini app source code
 // =============================================================================
 
+import * as fs from "fs";
+import * as path from "path";
 import {
   BLOCKED_PATTERNS,
   MAX_SOURCE_SIZE_BYTES,
   MAX_BUNDLE_SIZE_BYTES,
   validateImports,
+  validateManifest,
+  type Manifest,
 } from "@plotpaper/core";
 import { resolveSchema } from "./schema";
 import type { ResolvedSchema } from "./schema";
@@ -19,6 +23,11 @@ export interface ValidationResult {
   errors: string[];
   warnings: string[];
   schema: ResolvedSchema | null;
+}
+
+export interface ProjectValidationResult extends ValidationResult {
+  manifest: Manifest | null;
+  entryPath: string | null;
 }
 
 export interface ValidateOptions {
@@ -87,6 +96,69 @@ export function validateSource(source: string, options?: ValidateOptions): Valid
     errors,
     warnings,
     schema,
+  };
+}
+
+/**
+ * Validate a full project directory (with plotpaper.json manifest).
+ * Reads manifest, entry file, schema, and permissions.
+ */
+export function validateProject(projectDir: string): ProjectValidationResult {
+  const manifestPath = path.join(projectDir, "plotpaper.json");
+
+  if (!fs.existsSync(manifestPath)) {
+    return {
+      valid: false,
+      errors: [`No plotpaper.json found in ${projectDir}`],
+      warnings: [],
+      schema: null,
+      manifest: null,
+      entryPath: null,
+    };
+  }
+
+  let manifest: Manifest;
+  try {
+    manifest = validateManifest(fs.readFileSync(manifestPath, "utf-8"));
+  } catch (e: any) {
+    return {
+      valid: false,
+      errors: [e.message],
+      warnings: [],
+      schema: null,
+      manifest: null,
+      entryPath: null,
+    };
+  }
+
+  const entryPath = path.join(projectDir, manifest.entry);
+
+  if (!fs.existsSync(entryPath)) {
+    return {
+      valid: false,
+      errors: [`Entry file not found: ${manifest.entry} (resolved to ${entryPath})`],
+      warnings: [],
+      schema: null,
+      manifest,
+      entryPath,
+    };
+  }
+
+  const source = fs.readFileSync(entryPath, "utf-8");
+
+  // Resolve schema from project dir
+  const schemaPath = path.join(projectDir, "schema.json");
+  const explicitSchema = fs.existsSync(schemaPath) ? schemaPath : undefined;
+
+  const result = validateSource(source, {
+    filePath: entryPath,
+    schemaPath: explicitSchema,
+  });
+
+  return {
+    ...result,
+    manifest,
+    entryPath,
   };
 }
 
