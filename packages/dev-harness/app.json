@@ -4,7 +4,7 @@
     "slug": "plotpaper-dev-harness",
     "version": "0.1.0",
     "scheme": "plotpaper-dev",
-    "platforms": ["ios", "android"],
+    "platforms": ["ios", "android", "web"],
     "icon": "./assets/icon.png",
     "splash": {
       "backgroundColor": "#ffffff"

@@ -14,12 +14,6 @@ Or use npx without installing:
 npx @plotpaper/cli validate ./MyApp.tsx
 ```
 
-## Install types (optional, for TypeScript)
-
-```bash
-npm install -D @plotpaper/types
-```
-
 ## Create your first app
 
 Create a directory with two files:
