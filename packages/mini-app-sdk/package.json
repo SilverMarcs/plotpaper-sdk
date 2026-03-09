@@ -1,0 +1,51 @@
+{
+  "name": "@plotpaper/mini-app-sdk",
+  "version": "0.1.0",
+  "description": "Build mini apps for Plotpaper — hooks, components, and types",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-native": ">=0.72.0",
+    "@expo/vector-icons": ">=14.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    },
+    "@expo/vector-icons": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@expo/vector-icons": "^15.0.0",
+    "@types/react": "^18.2.0",
+    "react": "^18.2.0",
+    "react-native": "^0.76.0",
+    "typescript": "^5.4.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plotpaper/plotpaper-sdk"
+  },
+  "keywords": [
+    "plotpaper",
+    "mini-app",
+    "sdk",
+    "react-native"
+  ]
+}

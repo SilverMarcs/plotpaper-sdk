@@ -1,0 +1,11 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@plotpaper/mini-app-sdk": ["./mini-app-sdk/index"],
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "mini-app-sdk/**/*.ts", "mini-app-sdk/**/*.tsx"]
+}

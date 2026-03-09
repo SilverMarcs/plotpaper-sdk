@@ -1,0 +1,19 @@
+{
+  "entities": [
+    {
+      "name": "habits",
+      "attrs": [
+        { "name": "name", "valueType": "string" },
+        { "name": "icon", "valueType": "string" },
+        { "name": "color", "valueType": "string" }
+      ]
+    },
+    {
+      "name": "completions",
+      "attrs": [
+        { "name": "habitId", "valueType": "string", "indexed": true },
+        { "name": "date", "valueType": "string", "indexed": true }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Plotpaper Dev Harness",
+    "slug": "plotpaper-dev-harness",
+    "version": "0.1.0",
+    "scheme": "plotpaper-dev",
+    "platforms": ["ios", "android"],
+    "icon": "./assets/icon.png",
+    "splash": {
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "bundleIdentifier": "com.plotpaper.devharness"
+    },
+    "android": {
+      "package": "com.plotpaper.devharness"
+    }
+  }
+}

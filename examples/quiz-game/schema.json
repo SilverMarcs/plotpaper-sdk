@@ -1,0 +1,14 @@
+{
+  "entities": [
+    {
+      "name": "quizzes",
+      "attrs": [
+        { "name": "topic", "valueType": "string" },
+        { "name": "questions", "valueType": "json" },
+        { "name": "score", "valueType": "number" },
+        { "name": "total", "valueType": "number" },
+        { "name": "status", "valueType": "string", "indexed": true }
+      ]
+    }
+  ]
+}

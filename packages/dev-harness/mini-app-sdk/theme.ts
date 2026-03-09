@@ -1,0 +1,43 @@
+// Theme colors matching the Plotpaper app
+
+export const lightTheme = {
+  background: "#FFFFFF",
+  foreground: "#0A0A0B",
+  card: "#F5F5FA",
+  cardForeground: "#0A0A0B",
+  primary: "#0A1914",
+  primaryForeground: "#FEF6F7",
+  secondary: "#F4F4F5",
+  secondaryForeground: "#18181B",
+  muted: "#F4F4F5",
+  mutedForeground: "#71717A",
+  accent: "#EDF3F1",
+  accentForeground: "#18181B",
+  border: "#E4E4E7",
+  input: "#E4E4E7",
+  destructive: "#EF4444",
+  success: "#2CD15E",
+  warning: "#F17818",
+  info: "#1AA7FF",
+};
+
+export const darkTheme = {
+  background: "#0B0A09",
+  foreground: "#F2F2F2",
+  card: "#27272A",
+  cardForeground: "#F2F2F2",
+  primary: "#D4611F",
+  primaryForeground: "#FFFFFF",
+  secondary: "#292524",
+  secondaryForeground: "#FAFAFA",
+  muted: "#262626",
+  mutedForeground: "#A1A1AA",
+  accent: "#29231F",
+  accentForeground: "#FAFAFA",
+  border: "#292524",
+  input: "#292524",
+  destructive: "#EF4444",
+  success: "#2CD15E",
+  warning: "#F17818",
+  info: "#1AA7FF",
+};

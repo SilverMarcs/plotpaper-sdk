@@ -1,0 +1,22 @@
+{
+  "entities": [
+    {
+      "name": "polls",
+      "attrs": [
+        { "name": "question", "valueType": "string" },
+        { "name": "options", "valueType": "json" },
+        { "name": "createdBy", "valueType": "string", "indexed": true },
+        { "name": "createdByName", "valueType": "string" }
+      ]
+    },
+    {
+      "name": "votes",
+      "attrs": [
+        { "name": "pollId", "valueType": "string", "indexed": true },
+        { "name": "optionIndex", "valueType": "number" },
+        { "name": "votedBy", "valueType": "string", "indexed": true },
+        { "name": "votedByName", "valueType": "string" }
+      ]
+    }
+  ]
+}

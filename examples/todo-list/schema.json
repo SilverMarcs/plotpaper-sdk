@@ -1,0 +1,11 @@
+{
+  "entities": [
+    {
+      "name": "todos",
+      "attrs": [
+        { "name": "title", "valueType": "string" },
+        { "name": "done", "valueType": "boolean" }
+      ]
+    }
+  ]
+}

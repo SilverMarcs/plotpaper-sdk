@@ -1,0 +1,13 @@
+{
+  "name": "plotpaper-sdk",
+  "private": true,
+  "workspaces": [
+    "packages/mini-app-sdk",
+    "packages/cli"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:sdk": "npm run build -w packages/mini-app-sdk",
+    "build:cli": "npm run build -w packages/cli"
+  }
+}
