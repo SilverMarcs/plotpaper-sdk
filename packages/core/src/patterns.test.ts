@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { BLOCKED_PATTERNS, ALLOWED_MODULES } from "./patterns";
+import { BLOCKED_PATTERNS, ALLOWED_MODULES, getAllowedModules } from "./patterns";
+import { CORE_MODULES, OPTIONAL_MODULES } from "./constants";
 
 describe("BLOCKED_PATTERNS", () => {
   it("blocks fetch()", () => {
@@ -78,24 +79,13 @@ describe("BLOCKED_PATTERNS", () => {
     expect(pattern.pattern.test("globalThis.__ppModules")).toBe(false);
   });
 
-  it("blocks forbidden imports", () => {
-    const importPattern = BLOCKED_PATTERNS.find((p) => p.label === "forbidden import")!;
-    expect(importPattern.pattern.test('import axios from "axios"')).toBe(true);
-    expect(importPattern.pattern.test('import fs from "fs"')).toBe(true);
-    expect(importPattern.pattern.test('import React from "react"')).toBe(false);
-    expect(importPattern.pattern.test('import { View } from "react-native"')).toBe(false);
-    expect(importPattern.pattern.test('import { usePlotpaperSDK } from "@plotpaper/mini-app-sdk"')).toBe(false);
-  });
-
-  it("blocks forbidden require", () => {
-    const requirePattern = BLOCKED_PATTERNS.find((p) => p.label === "forbidden require()")!;
-    expect(requirePattern.pattern.test('require("fs")')).toBe(true);
-    expect(requirePattern.pattern.test('require("react")')).toBe(false);
+  it("has 13 blocked patterns (imports handled separately)", () => {
+    expect(BLOCKED_PATTERNS).toHaveLength(13);
   });
 });
 
 describe("ALLOWED_MODULES", () => {
-  it("includes all expected modules", () => {
+  it("includes all core modules", () => {
     expect(ALLOWED_MODULES).toContain("react");
     expect(ALLOWED_MODULES).toContain("react-native");
     expect(ALLOWED_MODULES).toContain("@plotpaper/mini-app-sdk");
@@ -104,7 +94,28 @@ describe("ALLOWED_MODULES", () => {
     expect(ALLOWED_MODULES).toContain("react-native-safe-area-context");
   });
 
-  it("has exactly 6 modules", () => {
-    expect(ALLOWED_MODULES).toHaveLength(6);
+  it("equals CORE_MODULES", () => {
+    expect(ALLOWED_MODULES).toEqual(CORE_MODULES);
+  });
+});
+
+describe("getAllowedModules", () => {
+  it("returns core modules when no optional modules declared", () => {
+    expect(getAllowedModules()).toEqual(CORE_MODULES);
+    expect(getAllowedModules([])).toEqual(CORE_MODULES);
+  });
+
+  it("adds valid optional modules", () => {
+    const result = getAllowedModules(["expo-haptics", "expo-clipboard"]);
+    expect(result).toEqual([...CORE_MODULES, "expo-haptics", "expo-clipboard"]);
+  });
+
+  it("throws on unknown modules", () => {
+    expect(() => getAllowedModules(["unknown-pkg"])).toThrow("Unknown modules");
+  });
+
+  it("accepts all defined optional modules", () => {
+    const result = getAllowedModules(OPTIONAL_MODULES);
+    expect(result).toEqual([...CORE_MODULES, ...OPTIONAL_MODULES]);
   });
 });

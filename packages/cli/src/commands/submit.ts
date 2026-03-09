@@ -6,16 +6,14 @@ import * as fs from "fs";
 import * as path from "path";
 import chalk from "chalk";
 import { SDK_VERSION } from "@plotpaper/core";
-import { validateSource, validateProject } from "../validation";
+import { validateProject } from "../validation";
 import { loadConfig } from "../utils/config";
 import { submitApp } from "../utils/api";
-import type { Manifest } from "@plotpaper/core";
 
 export interface SubmitOptions {
   name?: string;
   description?: string;
   mode?: "private" | "multiplayer";
-  schema?: string;
 }
 
 export async function runSubmit(target: string, options: SubmitOptions): Promise<void> {
@@ -26,45 +24,24 @@ export async function runSubmit(target: string, options: SubmitOptions): Promise
     process.exit(1);
   }
 
-  const stat = fs.statSync(resolved);
-  let source: string;
-  let manifest: Manifest | undefined;
-  let validationResult: { valid: boolean; errors: string[]; schema: any };
-
-  if (stat.isDirectory()) {
-    // Project directory — read manifest
-    const projectResult = validateProject(resolved);
-    if (!projectResult.valid) {
-      console.log(chalk.red.bold(`\n  Validation failed:`));
-      for (const err of projectResult.errors) {
-        console.log(chalk.red(`  ✗ ${err}`));
-      }
-      process.exit(1);
-    }
-
-    manifest = projectResult.manifest!;
-    source = fs.readFileSync(projectResult.entryPath!, "utf-8");
-    validationResult = projectResult;
-  } else {
-    // Single file — backward compat
-    source = fs.readFileSync(resolved, "utf-8");
-    const validation = validateSource(source, {
-      filePath: resolved,
-      schemaPath: options.schema,
-    });
-    if (!validation.valid) {
-      console.log(chalk.red.bold(`\n  Validation failed:`));
-      for (const err of validation.errors) {
-        console.log(chalk.red(`  ✗ ${err}`));
-      }
-      process.exit(1);
-    }
-    validationResult = validation;
+  if (!fs.statSync(resolved).isDirectory()) {
+    console.error(chalk.red(`Expected a project directory: ${resolved}`));
+    console.error(chalk.dim(`  Run 'plotpaper init' to create a project.`));
+    process.exit(1);
   }
 
-  const displayName = stat.isDirectory()
-    ? `${manifest!.name} (${path.basename(resolved)}/)`
-    : path.basename(resolved);
+  const projectResult = validateProject(resolved);
+  if (!projectResult.valid) {
+    console.log(chalk.red.bold(`\n  Validation failed:`));
+    for (const err of projectResult.errors) {
+      console.log(chalk.red(`  ✗ ${err}`));
+    }
+    process.exit(1);
+  }
+
+  const manifest = projectResult.manifest!;
+  const source = fs.readFileSync(projectResult.entryPath!, "utf-8");
+  const displayName = `${manifest.name} (${path.basename(resolved)}/)`;
 
   console.log();
   console.log(chalk.bold(`Submitting ${displayName}`));
@@ -78,20 +55,14 @@ export async function runSubmit(target: string, options: SubmitOptions): Promise
   }
 
   // Resolve app metadata: manifest values, with CLI flags as overrides
-  const name = options.name
-    || manifest?.name
-    || path.basename(resolved, path.extname(resolved));
-  const description = options.description
-    || manifest?.description
-    || "";
-  const appMode = options.mode
-    || manifest?.mode
-    || "private";
-  const sdkVersion = manifest?.sdkVersion || SDK_VERSION;
+  const name = options.name || manifest.name;
+  const description = options.description || manifest.description || "";
+  const appMode = options.mode || manifest.mode || "private";
+  const sdkVersion = manifest.sdkVersion || SDK_VERSION;
 
   // Schema and permissions from validation result
-  const schema = validationResult.schema?.schema;
-  const permissions = validationResult.schema?.permissions;
+  const schema = projectResult.schema?.schema;
+  const permissions = projectResult.schema?.permissions;
 
   console.log(chalk.dim(`\n  Name: ${name}`));
   console.log(chalk.dim(`  Mode: ${appMode}`));

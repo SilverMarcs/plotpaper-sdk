@@ -5,10 +5,16 @@
 // =============================================================================
 
 // Constants
-export { SDK_VERSION, MAX_SOURCE_SIZE_BYTES, MAX_BUNDLE_SIZE_BYTES } from "./constants";
+export {
+  SDK_VERSION,
+  MAX_SOURCE_SIZE_BYTES,
+  MAX_BUNDLE_SIZE_BYTES,
+  CORE_MODULES,
+  OPTIONAL_MODULES,
+} from "./constants";
 
 // Validation rules
-export { ALLOWED_MODULES, BLOCKED_PATTERNS } from "./patterns";
+export { ALLOWED_MODULES, BLOCKED_PATTERNS, getAllowedModules } from "./patterns";
 export { validateImports } from "./imports";
 export {
   SchemaInputZ,

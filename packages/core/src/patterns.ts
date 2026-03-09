@@ -2,26 +2,34 @@
 // Validation Rules — single source of truth for CLI, server, and app runtime
 // =============================================================================
 
-export const ALLOWED_MODULES = [
-  "react",
-  "react-native",
-  "@plotpaper/mini-app-sdk",
-  "@expo/vector-icons/Feather",
-  "react-native-svg",
-  "react-native-safe-area-context",
-];
+import { CORE_MODULES, OPTIONAL_MODULES } from "./constants";
 
-function buildAllowedModulesPattern(): string {
-  return ALLOWED_MODULES.map((m) =>
-    m.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&"),
-  ).join("|");
+/** Core modules — always available (backward compat alias) */
+export const ALLOWED_MODULES = [...CORE_MODULES];
+
+/**
+ * Get the effective allowed modules for a project.
+ * Validates declared optional modules against the known set.
+ */
+export function getAllowedModules(declaredModules?: string[]): string[] {
+  if (!declaredModules || declaredModules.length === 0) return [...CORE_MODULES];
+
+  const optionalSet = new Set(OPTIONAL_MODULES);
+  const invalid = declaredModules.filter((m) => !optionalSet.has(m));
+  if (invalid.length > 0) {
+    throw new Error(
+      `Unknown modules: ${invalid.join(", ")}.\nAvailable optional modules: ${OPTIONAL_MODULES.join(", ")}`,
+    );
+  }
+
+  return [...CORE_MODULES, ...declaredModules];
 }
 
-const allowedAlt = buildAllowedModulesPattern();
-
+/**
+ * Blocked source code patterns. Import validation is handled separately
+ * by validateImports() and the esbuild plugin.
+ */
 export const BLOCKED_PATTERNS: Array<{ pattern: RegExp; label: string; help: string }> = [
-  { pattern: new RegExp(`require\\s*\\(\\s*["'](?!(?:${allowedAlt})["'])`), label: "forbidden require()", help: "Only these modules can be imported: " + ALLOWED_MODULES.join(", ") },
-  { pattern: new RegExp(`import\\s+.*from\\s+["'](?!(?:${allowedAlt})["'])`), label: "forbidden import", help: "Only these modules can be imported: " + ALLOWED_MODULES.join(", ") },
   { pattern: /\bfetch\s*\(/, label: "fetch()", help: "Network requests are not allowed. Use sdk.ai for AI-generated content." },
   { pattern: /XMLHttpRequest/, label: "XMLHttpRequest", help: "Network requests are not allowed. Use sdk.ai for AI-generated content." },
   { pattern: /\beval\s*\(/, label: "eval()", help: "eval() is not allowed for security reasons." },

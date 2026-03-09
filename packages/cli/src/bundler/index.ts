@@ -18,13 +18,15 @@ export { plotpaperModulesPlugin, wrapBundle } from "@plotpaper/core";
  * @param source Raw .tsx source code
  * @param bundleId Unique bundle identifier
  * @param resolveDir Directory for resolving relative imports (optional)
+ * @param allowedModules Override the allowed modules list (optional)
  * @returns Bundled IIFE string
  */
 export async function bundle(
   source: string,
   bundleId: string,
   resolveDir?: string,
+  allowedModules?: string[],
 ): Promise<string> {
-  const { code } = await buildSource(source, resolveDir);
+  const { code } = await buildSource(source, resolveDir, allowedModules);
   return wrapBundle(code, bundleId);
 }

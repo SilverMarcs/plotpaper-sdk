@@ -7,15 +7,15 @@ import * as path from "path";
 import {
   BLOCKED_PATTERNS,
   MAX_SOURCE_SIZE_BYTES,
-  MAX_BUNDLE_SIZE_BYTES,
   validateImports,
   validateManifest,
+  getAllowedModules,
   type Manifest,
 } from "@plotpaper/core";
 import { resolveSchema } from "./schema";
 import type { ResolvedSchema } from "./schema";
 
-export { validateSchema, resolveSchema } from "./schema";
+export { resolveSchema } from "./schema";
 export type { ResolvedSchema } from "./schema";
 
 export interface ValidationResult {
@@ -28,6 +28,7 @@ export interface ValidationResult {
 export interface ProjectValidationResult extends ValidationResult {
   manifest: Manifest | null;
   entryPath: string | null;
+  allowedModules: string[];
 }
 
 export interface ValidateOptions {
@@ -35,6 +36,8 @@ export interface ValidateOptions {
   filePath?: string;
   /** Explicit path to a schema.json file */
   schemaPath?: string;
+  /** Allowed modules list (defaults to CORE_MODULES) */
+  allowedModules?: string[];
 }
 
 /**
@@ -63,12 +66,10 @@ export function validateSource(source: string, options?: ValidateOptions): Valid
     }
   }
 
-  // 4. Import validation (more detailed than blocked patterns)
-  const importViolations = validateImports(source);
+  // 4. Import validation
+  const importViolations = validateImports(source, options?.allowedModules);
   for (const v of importViolations) {
-    if (!errors.some((e) => e.includes("forbidden import") || e.includes("forbidden require"))) {
-      errors.push(v);
-    }
+    errors.push(v);
   }
 
   // 5. Schema validation — resolve from schema.json file
@@ -114,6 +115,7 @@ export function validateProject(projectDir: string): ProjectValidationResult {
       schema: null,
       manifest: null,
       entryPath: null,
+      allowedModules: [],
     };
   }
 
@@ -128,6 +130,7 @@ export function validateProject(projectDir: string): ProjectValidationResult {
       schema: null,
       manifest: null,
       entryPath: null,
+      allowedModules: [],
     };
   }
 
@@ -141,10 +144,27 @@ export function validateProject(projectDir: string): ProjectValidationResult {
       schema: null,
       manifest,
       entryPath,
+      allowedModules: [],
     };
   }
 
   const source = fs.readFileSync(entryPath, "utf-8");
+
+  // Resolve allowed modules from manifest
+  let allowedModules: string[];
+  try {
+    allowedModules = getAllowedModules(manifest.modules);
+  } catch (e: any) {
+    return {
+      valid: false,
+      errors: [e.message],
+      warnings: [],
+      schema: null,
+      manifest,
+      entryPath,
+      allowedModules: [],
+    };
+  }
 
   // Resolve schema from project dir
   const schemaPath = path.join(projectDir, "schema.json");
@@ -153,12 +173,14 @@ export function validateProject(projectDir: string): ProjectValidationResult {
   const result = validateSource(source, {
     filePath: entryPath,
     schemaPath: explicitSchema,
+    allowedModules,
   });
 
   return {
     ...result,
     manifest,
     entryPath,
+    allowedModules,
   };
 }
 
@@ -167,10 +189,10 @@ export function validateProject(projectDir: string): ProjectValidationResult {
  */
 export function validateBundle(bundle: string): { valid: boolean; error?: string } {
   const sizeBytes = Buffer.byteLength(bundle, "utf-8");
-  if (sizeBytes > MAX_BUNDLE_SIZE_BYTES) {
+  if (sizeBytes > 150_000) {
     return {
       valid: false,
-      error: `Bundle is ${sizeBytes} bytes, exceeds ${MAX_BUNDLE_SIZE_BYTES} byte limit`,
+      error: `Bundle is ${sizeBytes} bytes, exceeds 150000 byte limit`,
     };
   }
   return { valid: true };

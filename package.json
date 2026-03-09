@@ -12,6 +12,12 @@
     "build:sdk": "npm run build -w packages/mini-app-sdk",
     "build:cli": "npm run build -w packages/cli",
     "test": "npm run test -w packages/core && npm run test -w packages/cli",
-    "test:watch": "npm run test:watch -w packages/cli"
+    "test:watch": "npm run test:watch -w packages/cli",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "npm run build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.30.0"
   }
 }

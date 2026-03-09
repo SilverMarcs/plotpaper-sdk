@@ -1,18 +1,13 @@
 // =============================================================================
-// validate command — check source code against all rules
+// validate command — check a project directory against all rules
 // =============================================================================
 
 import * as fs from "fs";
 import * as path from "path";
 import chalk from "chalk";
-import { validateSource, validateProject } from "../validation";
-import type { ValidationResult, ProjectValidationResult } from "../validation";
+import { validateProject } from "../validation";
 
-export interface ValidateOptions {
-  schema?: string;
-}
-
-export async function runValidate(target: string, options?: ValidateOptions): Promise<void> {
+export async function runValidate(target: string): Promise<void> {
   const resolved = path.resolve(target);
 
   if (!fs.existsSync(resolved)) {
@@ -20,30 +15,16 @@ export async function runValidate(target: string, options?: ValidateOptions): Pr
     process.exit(1);
   }
 
-  const stat = fs.statSync(resolved);
-  let result: ValidationResult | ProjectValidationResult;
-  let displayName: string;
-  let source: string;
-
-  if (stat.isDirectory()) {
-    // Project directory — read manifest
-    const projectResult = validateProject(resolved);
-    result = projectResult;
-    displayName = projectResult.manifest
-      ? `${projectResult.manifest.name} (${path.basename(resolved)}/)`
-      : path.basename(resolved) + "/";
-    source = projectResult.entryPath && fs.existsSync(projectResult.entryPath)
-      ? fs.readFileSync(projectResult.entryPath, "utf-8")
-      : "";
-  } else {
-    // Single file — backward compat
-    source = fs.readFileSync(resolved, "utf-8");
-    result = validateSource(source, {
-      filePath: resolved,
-      schemaPath: options?.schema,
-    });
-    displayName = path.basename(resolved);
+  if (!fs.statSync(resolved).isDirectory()) {
+    console.error(chalk.red(`Expected a project directory: ${resolved}`));
+    console.error(chalk.dim(`  Run 'plotpaper init' to create a project.`));
+    process.exit(1);
   }
+
+  const result = validateProject(resolved);
+  const displayName = result.manifest
+    ? `${result.manifest.name} (${path.basename(resolved)}/)`
+    : path.basename(resolved) + "/";
 
   console.log();
   console.log(chalk.bold(`Validating ${displayName}`));
@@ -80,6 +61,10 @@ export async function runValidate(target: string, options?: ValidateOptions): Pr
   }
 
   if (result.valid) {
+    const entryPath = result.entryPath;
+    const source = entryPath && fs.existsSync(entryPath)
+      ? fs.readFileSync(entryPath, "utf-8")
+      : "";
     const sizeKB = source
       ? (Buffer.byteLength(source, "utf-8") / 1024).toFixed(1)
       : "0";

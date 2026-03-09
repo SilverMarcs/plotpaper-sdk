@@ -8,6 +8,7 @@ import { runBundle } from "./commands/bundle";
 import { runSubmit } from "./commands/submit";
 import { runInit } from "./commands/init";
 import { runDev } from "./commands/dev";
+import { runCodegen } from "./commands/codegen";
 import { runLogin } from "./commands/login";
 import { saveConfig } from "./utils/config";
 
@@ -29,48 +30,51 @@ program
 
 // ── dev ───────────────────────────────────────────────────────────────
 program
-  .command("dev <path>")
-  .description("Watch a mini app project or file with live validation and bundling")
-  .option("-s, --schema <path>", "Path to schema.json file")
-  .option("-o, --output <path>", "Output bundle path")
-  .action(async (target: string, options: { schema?: string; output?: string }) => {
+  .command("dev <directory>")
+  .description("Start dev server with web preview and live reload")
+  .option("-p, --port <port>", "Port number", "3000")
+  .action(async (target: string, options: { port?: string }) => {
     await runDev(target, options);
   });
 
 // ── validate ────────────────────────────────────────────────────────────
 program
-  .command("validate <path>")
-  .description("Validate a mini app project or source file against all rules")
-  .option("-s, --schema <path>", "Path to schema.json file")
-  .action(async (target: string, options: { schema?: string }) => {
-    await runValidate(target, options);
+  .command("validate <directory>")
+  .description("Validate a mini app project against all rules")
+  .action(async (target: string) => {
+    await runValidate(target);
   });
 
 // ── bundle ──────────────────────────────────────────────────────────────
 program
-  .command("bundle <path>")
-  .description("Bundle a mini app project or source file into an IIFE")
+  .command("bundle <directory>")
+  .description("Bundle a mini app project into an IIFE")
   .option("-o, --output <path>", "Output file path")
   .option("--bundle-id <id>", "Custom bundle ID (default: random UUID)")
-  .option("-s, --schema <path>", "Path to schema.json file")
-  .action(async (target: string, options: { output?: string; bundleId?: string; schema?: string }) => {
+  .action(async (target: string, options: { output?: string; bundleId?: string }) => {
     await runBundle(target, options);
+  });
+
+// ── codegen ─────────────────────────────────────────────────────────────
+program
+  .command("codegen <directory>")
+  .description("Generate TypeScript types from schema.json")
+  .action(async (target: string) => {
+    await runCodegen(target);
   });
 
 // ── submit ──────────────────────────────────────────────────────────────
 program
-  .command("submit <path>")
-  .description("Submit a mini app project or file to the Plotpaper platform")
+  .command("submit <directory>")
+  .description("Submit a mini app project to the Plotpaper platform")
   .option("-n, --name <name>", "App name (overrides manifest)")
   .option("-d, --description <desc>", "App description (overrides manifest)")
   .option("-m, --mode <mode>", "App mode: private or multiplayer (overrides manifest)")
-  .option("-s, --schema <path>", "Path to schema.json file")
-  .action(async (target: string, options: { name?: string; description?: string; mode?: string; schema?: string }) => {
+  .action(async (target: string, options: { name?: string; description?: string; mode?: string }) => {
     await runSubmit(target, {
       name: options.name,
       description: options.description,
       mode: (options.mode as "private" | "multiplayer") || undefined,
-      schema: options.schema,
     });
   });
 

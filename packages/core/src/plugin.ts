@@ -4,22 +4,25 @@
 // =============================================================================
 
 import type { Plugin } from "esbuild";
-import { ALLOWED_MODULES } from "./patterns";
-
-const ALLOWED_SET = new Set(ALLOWED_MODULES);
-
-const ALLOWED_FILTER = new RegExp(
-  "^(" +
-    ALLOWED_MODULES.map((m) => m.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&")).join("|") +
-    ")$",
-);
+import { CORE_MODULES } from "./constants";
 
 /**
  * esbuild plugin that:
  * 1. Resolves allowed modules to virtual modules returning __ppModules lookups
  * 2. Blocks all other non-relative imports with a clear error
+ *
+ * @param allowedModules Override the allowed modules list (defaults to CORE_MODULES)
  */
-export function plotpaperModulesPlugin(): Plugin {
+export function plotpaperModulesPlugin(allowedModules?: string[]): Plugin {
+  const modules = allowedModules || CORE_MODULES;
+  const ALLOWED_SET = new Set(modules);
+
+  const ALLOWED_FILTER = new RegExp(
+    "^(" +
+      modules.map((m) => m.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&")).join("|") +
+      ")$",
+  );
+
   return {
     name: "plotpaper-modules",
     setup(build) {
@@ -47,7 +50,7 @@ export function plotpaperModulesPlugin(): Plugin {
         return {
           errors: [
             {
-              text: `Import "${args.path}" is not allowed. Allowed modules: ${ALLOWED_MODULES.join(", ")}`,
+              text: `Import "${args.path}" is not allowed. Allowed modules: ${modules.join(", ")}`,
             },
           ],
         };

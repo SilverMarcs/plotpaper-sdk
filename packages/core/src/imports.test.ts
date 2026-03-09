@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { validateImports } from "./imports";
+import { CORE_MODULES } from "./constants";
 
 describe("validateImports", () => {
-  it("allows all permitted modules", () => {
+  it("allows all core modules", () => {
     const source = `
       import React from "react";
       import { View, Text } from "react-native";
@@ -57,5 +58,20 @@ describe("validateImports", () => {
     const source = `import Something from "react-native-gesture-handler/DrawerLayout";`;
     const violations = validateImports(source);
     expect(violations).toHaveLength(1);
+  });
+
+  it("accepts custom allowed modules list", () => {
+    const source = `import haptics from "expo-haptics";`;
+    expect(validateImports(source, [...CORE_MODULES, "expo-haptics"])).toEqual([]);
+    expect(validateImports(source)).toHaveLength(1); // rejected without custom list
+  });
+
+  it("allows optional modules when declared in manifest", () => {
+    const source = `
+      import React from "react";
+      import * as Haptics from "expo-haptics";
+    `;
+    const allowed = [...CORE_MODULES, "expo-haptics"];
+    expect(validateImports(source, allowed)).toEqual([]);
   });
 });

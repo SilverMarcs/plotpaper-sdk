@@ -2,13 +2,17 @@
 // Import Validation — checks source imports against the allowed module list
 // =============================================================================
 
-import { ALLOWED_MODULES } from "./patterns";
+import { CORE_MODULES } from "./constants";
 
 /**
  * Extract all import sources from source code and check against allowed list.
  * Returns list of violations (empty = all good).
+ *
+ * @param source Source code to check
+ * @param allowedModules Override the allowed modules list (defaults to CORE_MODULES)
  */
-export function validateImports(source: string): string[] {
+export function validateImports(source: string, allowedModules?: string[]): string[] {
+  const allowed = allowedModules || CORE_MODULES;
   const violations: string[] = [];
 
   // Match ES import statements
@@ -16,8 +20,8 @@ export function validateImports(source: string): string[] {
   let match;
   while ((match = importRegex.exec(source)) !== null) {
     const mod = match[1];
-    if (!ALLOWED_MODULES.includes(mod)) {
-      violations.push(`Forbidden import: "${mod}" — only allowed: ${ALLOWED_MODULES.join(", ")}`);
+    if (!allowed.includes(mod)) {
+      violations.push(`Forbidden import: "${mod}" — only allowed: ${allowed.join(", ")}`);
     }
   }
 
@@ -25,8 +29,8 @@ export function validateImports(source: string): string[] {
   const requireRegex = /require\s*\(\s*["']([^"']+)["']\s*\)/g;
   while ((match = requireRegex.exec(source)) !== null) {
     const mod = match[1];
-    if (!ALLOWED_MODULES.includes(mod)) {
-      violations.push(`Forbidden require: "${mod}" — only allowed: ${ALLOWED_MODULES.join(", ")}`);
+    if (!allowed.includes(mod)) {
+      violations.push(`Forbidden require: "${mod}" — only allowed: ${allowed.join(", ")}`);
     }
   }
 

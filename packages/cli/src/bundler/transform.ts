@@ -9,15 +9,14 @@ import { plotpaperModulesPlugin } from "@plotpaper/core";
 /**
  * Bundle source code using esbuild with the plotpaper modules plugin.
  *
- * This replaces the old pipeline of:
- *   esbuild.transform → stripComments → regexRewriteImports
- *
- * esbuild handles JSX, import resolution (via plugin), tree-shaking,
- * and comment removal as a proper AST-level operation.
+ * @param source Raw .tsx source code
+ * @param resolveDir Directory for resolving relative imports (optional)
+ * @param allowedModules Override the allowed modules list (optional)
  */
 export async function buildSource(
   source: string,
   resolveDir?: string,
+  allowedModules?: string[],
 ): Promise<{ code: string; defaultExportName: string }> {
   const result = await esbuild.build({
     stdin: {
@@ -34,7 +33,7 @@ export async function buildSource(
     jsxFactory: "React.createElement",
     jsxFragment: "React.Fragment",
     charset: "utf8",
-    plugins: [plotpaperModulesPlugin()],
+    plugins: [plotpaperModulesPlugin(allowedModules)],
     logLevel: "silent",
   });
 

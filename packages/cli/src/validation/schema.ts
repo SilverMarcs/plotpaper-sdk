@@ -28,7 +28,7 @@ export interface ResolvedSchema {
  * Resolve schema for an app, checking in order:
  * 1. Explicit --schema flag path
  * 2. schema.json in the project root (directory containing plotpaper.json)
- * 3. schema.json alongside the source file (backward compat)
+ * 3. schema.json alongside the source file
  *
  * Also loads permissions.json if it exists next to the schema file.
  * Returns null if no schema found.
@@ -56,24 +56,7 @@ export function resolveSchema(
     return { schema, permissions };
   }
 
-  // 2. Look for plotpaper.json in the directory to identify project root
-  const manifestPath = path.join(dir, "plotpaper.json");
-  if (fs.existsSync(manifestPath)) {
-    const schemaJsonPath = path.join(dir, "schema.json");
-    if (fs.existsSync(schemaJsonPath)) {
-      const schema = validateSchema(fs.readFileSync(schemaJsonPath, "utf-8"));
-
-      const permPath = path.join(dir, "permissions.json");
-      let permissions: PermissionsInput | undefined;
-      if (fs.existsSync(permPath)) {
-        permissions = validatePermissions(fs.readFileSync(permPath, "utf-8"));
-      }
-
-      return { schema, permissions };
-    }
-  }
-
-  // 3. schema.json alongside source file (backward compat for single-file usage)
+  // 2. Look for schema.json in the project directory
   const schemaJsonPath = path.join(dir, "schema.json");
   if (fs.existsSync(schemaJsonPath)) {
     const schema = validateSchema(fs.readFileSync(schemaJsonPath, "utf-8"));

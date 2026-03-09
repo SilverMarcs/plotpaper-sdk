@@ -227,7 +227,7 @@ const TEMPLATES: Record<string, TemplateConfig> = {
   todo: { app: TODO_APP, schema: TODO_SCHEMA, permissions: TODO_PERMISSIONS, description: "Todo list with database" },
 };
 
-function makeManifest(name: string, template: string): string {
+function makeManifest(name: string): string {
   const manifest: Record<string, unknown> = {
     name,
     entry: "App.tsx",
@@ -268,7 +268,7 @@ export async function runInit(dir: string, options: InitOptions): Promise<void> 
   const projectName = path.basename(targetDir);
 
   // Write files
-  fs.writeFileSync(path.join(targetDir, "plotpaper.json"), makeManifest(projectName, template));
+  fs.writeFileSync(path.join(targetDir, "plotpaper.json"), makeManifest(projectName));
   fs.writeFileSync(path.join(targetDir, "App.tsx"), tmpl.app);
   fs.writeFileSync(path.join(targetDir, "schema.json"), tmpl.schema);
   fs.writeFileSync(path.join(targetDir, "permissions.json"), tmpl.permissions);
@@ -287,8 +287,9 @@ export async function runInit(dir: string, options: InitOptions): Promise<void> 
   console.log(chalk.dim(`    tsconfig.json     — TypeScript config`));
   console.log();
   console.log(chalk.bold(`  Next steps:`));
-  console.log(chalk.dim(`    plotpaper dev ${relDir}       — start dev mode`));
+  console.log(chalk.dim(`    plotpaper dev ${relDir}       — start dev server`));
   console.log(chalk.dim(`    plotpaper validate ${relDir}  — check for errors`));
+  console.log(chalk.dim(`    plotpaper codegen ${relDir}   — generate types from schema`));
   console.log(chalk.dim(`    plotpaper bundle ${relDir}    — create bundle`));
   console.log(chalk.dim(`    plotpaper submit ${relDir}    — submit to Plotpaper`));
 }

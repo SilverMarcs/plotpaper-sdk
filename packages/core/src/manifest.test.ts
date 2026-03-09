@@ -32,6 +32,7 @@ describe("validateManifest", () => {
     const manifest = validateManifest(JSON.stringify({ name: "test" }));
     expect(manifest.entry).toBe("App.tsx");
     expect(manifest.mode).toBe("private");
+    expect(manifest.modules).toBeUndefined();
   });
 
   it("rejects invalid JSON", () => {
@@ -82,6 +83,28 @@ describe("validateManifest", () => {
     expect(() =>
       validateManifest(JSON.stringify({ entry: "App.tsx" })),
     ).toThrow();
+  });
+
+  it("accepts valid optional modules", () => {
+    const manifest = validateManifest(
+      JSON.stringify({ name: "test", modules: ["expo-haptics", "expo-clipboard"] }),
+    );
+    expect(manifest.modules).toEqual(["expo-haptics", "expo-clipboard"]);
+  });
+
+  it("rejects unknown modules", () => {
+    expect(() =>
+      validateManifest(
+        JSON.stringify({ name: "test", modules: ["axios"] }),
+      ),
+    ).toThrow("Unknown modules");
+  });
+
+  it("accepts empty modules array", () => {
+    const manifest = validateManifest(
+      JSON.stringify({ name: "test", modules: [] }),
+    );
+    expect(manifest.modules).toEqual([]);
   });
 });
 
