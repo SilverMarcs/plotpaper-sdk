@@ -4,6 +4,7 @@
 
 import https from "https";
 import http from "http";
+import { SDK_VERSION } from "@plotpaper/core";
 
 export interface SubmitPayload {
   sourceCode: string;
@@ -12,6 +13,7 @@ export interface SubmitPayload {
   schema?: any;
   permissions?: any;
   appMode: "private" | "multiplayer";
+  sdkVersion: string;
 }
 
 export interface SubmitResult {
@@ -19,7 +21,12 @@ export interface SubmitResult {
   versionId?: string;
 }
 
-export async function submitApp(apiKey: string, payload: SubmitPayload): Promise<SubmitResult> {
+export interface SubmitAuth {
+  email?: string;
+  apiKey?: string;
+}
+
+export async function submitApp(auth: SubmitAuth, payload: SubmitPayload): Promise<SubmitResult> {
   const apiUrl = process.env.PLOTPAPER_API_URL || "https://api.plotpaper.com";
   const url = new URL("/api/custom-apps/submit", apiUrl);
 
@@ -27,17 +34,22 @@ export async function submitApp(apiKey: string, payload: SubmitPayload): Promise
   const isHttps = url.protocol === "https:";
   const httpModule = isHttps ? https : http;
 
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "Content-Length": String(Buffer.byteLength(body)),
+    "X-SDK-Version": SDK_VERSION,
+  };
+
+  if (auth.apiKey) {
+    headers["Authorization"] = `Bearer ${auth.apiKey}`;
+  } else if (auth.email) {
+    headers["X-Plotpaper-Email"] = auth.email;
+  }
+
   return new Promise((resolve, reject) => {
     const req = httpModule.request(
       url,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Length": Buffer.byteLength(body),
-        },
-      },
+      { method: "POST", headers },
       (res) => {
         let data = "";
         res.on("data", (chunk) => (data += chunk));

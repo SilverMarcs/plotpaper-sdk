@@ -3,11 +3,10 @@
 // =============================================================================
 
 import { buildSource } from "./transform";
-import { wrapBundle } from "./wrap";
+import { wrapBundle } from "@plotpaper/core";
 
 export { buildSource } from "./transform";
-export { wrapBundle } from "./wrap";
-export { plotpaperModulesPlugin } from "./plugin";
+export { plotpaperModulesPlugin, wrapBundle } from "@plotpaper/core";
 
 /**
  * Bundle raw source code into an IIFE string.

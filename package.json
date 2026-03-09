@@ -2,14 +2,16 @@
   "name": "plotpaper-sdk",
   "private": true,
   "workspaces": [
+    "packages/core",
     "packages/mini-app-sdk",
     "packages/cli"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
+    "build": "npm run build -w packages/core && npm run build -w packages/mini-app-sdk && npm run build -w packages/cli",
+    "build:core": "npm run build -w packages/core",
     "build:sdk": "npm run build -w packages/mini-app-sdk",
     "build:cli": "npm run build -w packages/cli",
-    "test": "npm run test -w packages/cli",
+    "test": "npm run test -w packages/core && npm run test -w packages/cli",
     "test:watch": "npm run test:watch -w packages/cli"
   }
 }

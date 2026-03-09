@@ -1,0 +1,42 @@
+{
+  "name": "@plotpaper/core",
+  "version": "0.1.0",
+  "description": "Shared validation, bundler utilities, and constants for the Plotpaper mini app platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "zod": "^3.23.0"
+  },
+  "peerDependencies": {
+    "esbuild": ">=0.17.0"
+  },
+  "peerDependenciesMeta": {
+    "esbuild": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.0",
+    "typescript": "^5.4.0",
+    "vitest": "^3.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plotpaper/plotpaper-sdk"
+  },
+  "keywords": ["plotpaper", "mini-app", "validation", "bundler"]
+}

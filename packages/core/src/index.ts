@@ -1,0 +1,23 @@
+// =============================================================================
+// @plotpaper/core — shared validation, bundler utilities, and constants
+//
+// Single source of truth for CLI, server, and app runtime.
+// =============================================================================
+
+// Constants
+export { SDK_VERSION, MAX_SOURCE_SIZE_BYTES, MAX_BUNDLE_SIZE_BYTES } from "./constants";
+
+// Validation rules
+export { ALLOWED_MODULES, BLOCKED_PATTERNS } from "./patterns";
+export { validateImports } from "./imports";
+export {
+  SchemaInputZ,
+  PermissionsZ,
+  validateSchema,
+  validatePermissions,
+} from "./schema";
+export type { SchemaInput, PermissionsInput } from "./schema";
+
+// Bundler utilities
+export { plotpaperModulesPlugin } from "./plugin";
+export { wrapBundle } from "./wrap";

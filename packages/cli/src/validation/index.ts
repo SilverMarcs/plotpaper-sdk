@@ -6,8 +6,8 @@ import {
   BLOCKED_PATTERNS,
   MAX_SOURCE_SIZE_BYTES,
   MAX_BUNDLE_SIZE_BYTES,
-} from "./patterns";
-import { validateImports } from "./imports";
+  validateImports,
+} from "@plotpaper/core";
 import { resolveSchema } from "./schema";
 import type { ResolvedSchema } from "./schema";
 

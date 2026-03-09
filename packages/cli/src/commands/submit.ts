@@ -5,8 +5,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import chalk from "chalk";
+import { SDK_VERSION } from "@plotpaper/core";
 import { validateSource } from "../validation";
-import { resolveSchema } from "../validation/schema";
 import { loadConfig } from "../utils/config";
 import { submitApp } from "../utils/api";
 
@@ -43,11 +43,11 @@ export async function runSubmit(filePath: string, options: SubmitOptions): Promi
     process.exit(1);
   }
 
-  // Load API key
+  // Load auth — email or API key
   const config = loadConfig();
-  if (!config.apiKey) {
-    console.error(chalk.red("\n  No API key found."));
-    console.error(chalk.dim("  Set PLOTPAPER_API_KEY env var or run: plotpaper config set-key <key>"));
+  if (!config.email && !config.apiKey) {
+    console.error(chalk.red("\n  Not logged in."));
+    console.error(chalk.dim("  Run: plotpaper login"));
     process.exit(1);
   }
 
@@ -62,6 +62,7 @@ export async function runSubmit(filePath: string, options: SubmitOptions): Promi
 
   console.log(chalk.dim(`\n  Name: ${name}`));
   console.log(chalk.dim(`  Mode: ${appMode}`));
+  console.log(chalk.dim(`  SDK:  ${SDK_VERSION}`));
   if (schema) {
     console.log(chalk.dim(`  Schema: ${schema.entities.length} entities`));
   }
@@ -70,14 +71,18 @@ export async function runSubmit(filePath: string, options: SubmitOptions): Promi
   }
 
   try {
-    const result = await submitApp(config.apiKey, {
-      sourceCode: source,
-      name,
-      description,
-      schema,
-      permissions,
-      appMode,
-    });
+    const result = await submitApp(
+      { email: config.email, apiKey: config.apiKey },
+      {
+        sourceCode: source,
+        name,
+        description,
+        schema,
+        permissions,
+        appMode,
+        sdkVersion: SDK_VERSION,
+      },
+    );
 
     console.log(chalk.green.bold(`\n  ✓ App submitted successfully`));
     console.log(chalk.dim(`    App ID: ${result.appId}`));

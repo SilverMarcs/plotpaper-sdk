@@ -4,7 +4,7 @@
 // =============================================================================
 
 import * as esbuild from "esbuild";
-import { plotpaperModulesPlugin } from "./plugin";
+import { plotpaperModulesPlugin } from "@plotpaper/core";
 
 /**
  * Bundle source code using esbuild with the plotpaper modules plugin.

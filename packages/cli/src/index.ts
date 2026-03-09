@@ -8,6 +8,7 @@ import { runBundle } from "./commands/bundle";
 import { runSubmit } from "./commands/submit";
 import { runInit } from "./commands/init";
 import { runDev } from "./commands/dev";
+import { runLogin } from "./commands/login";
 import { saveConfig } from "./utils/config";
 
 const program = new Command();
@@ -71,6 +72,14 @@ program
       mode: (options.mode as "private" | "multiplayer") || "private",
       schema: options.schema,
     });
+  });
+
+// ── login ───────────────────────────────────────────────────────────────
+program
+  .command("login")
+  .description("Log in with your Plotpaper email")
+  .action(async () => {
+    await runLogin();
   });
 
 // ── config ──────────────────────────────────────────────────────────────
