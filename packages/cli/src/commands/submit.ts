@@ -1,5 +1,5 @@
 // =============================================================================
-// submit command — validate and upload to Plotpaper platform
+// submit command — validate, bundle, and upload to Plotpaper platform
 // =============================================================================
 
 import * as fs from "fs";
@@ -7,10 +7,10 @@ import * as path from "path";
 import chalk from "chalk";
 import { validateSource } from "../validation";
 import { resolveSchema } from "../validation/schema";
-import { loadConfig } from "../utils/config";
 import { submitApp } from "../utils/api";
 
 export interface SubmitOptions {
+  email?: string;
   name?: string;
   description?: string;
   mode?: "private" | "multiplayer";
@@ -22,6 +22,12 @@ export async function runSubmit(filePath: string, options: SubmitOptions): Promi
 
   if (!fs.existsSync(resolved)) {
     console.error(chalk.red(`File not found: ${resolved}`));
+    process.exit(1);
+  }
+
+  if (!options.email) {
+    console.error(chalk.red("\n  Email is required."));
+    console.error(chalk.dim("  Use --email <your-email> to specify your registered Plotpaper email."));
     process.exit(1);
   }
 
@@ -43,14 +49,6 @@ export async function runSubmit(filePath: string, options: SubmitOptions): Promi
     process.exit(1);
   }
 
-  // Load API key
-  const config = loadConfig();
-  if (!config.apiKey) {
-    console.error(chalk.red("\n  No API key found."));
-    console.error(chalk.dim("  Set PLOTPAPER_API_KEY env var or run: plotpaper config set-key <key>"));
-    process.exit(1);
-  }
-
   // Resolve app name
   const name = options.name || path.basename(resolved, path.extname(resolved));
   const description = options.description || "";
@@ -60,7 +58,8 @@ export async function runSubmit(filePath: string, options: SubmitOptions): Promi
   const schema = validation.schema?.schema;
   const permissions = validation.schema?.permissions;
 
-  console.log(chalk.dim(`\n  Name: ${name}`));
+  console.log(chalk.dim(`\n  Email: ${options.email}`));
+  console.log(chalk.dim(`  Name: ${name}`));
   console.log(chalk.dim(`  Mode: ${appMode}`));
   if (schema) {
     console.log(chalk.dim(`  Schema: ${schema.entities.length} entities`));
@@ -70,7 +69,8 @@ export async function runSubmit(filePath: string, options: SubmitOptions): Promi
   }
 
   try {
-    const result = await submitApp(config.apiKey, {
+    const result = await submitApp({
+      email: options.email,
       sourceCode: source,
       name,
       description,
@@ -83,6 +83,9 @@ export async function runSubmit(filePath: string, options: SubmitOptions): Promi
     console.log(chalk.dim(`    App ID: ${result.appId}`));
     if (result.versionId) {
       console.log(chalk.dim(`    Version ID: ${result.versionId}`));
+    }
+    if (result.creditsCharged) {
+      console.log(chalk.dim(`    Credits charged: ${result.creditsCharged}`));
     }
   } catch (err: any) {
     console.error(chalk.red(`\n  Submit failed: ${err.message}`));

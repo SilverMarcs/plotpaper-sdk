@@ -92,15 +92,14 @@ Full bundler pipeline:
 4. Rewrite exports to `globalThis.__ppMiniApps[bundleId]`
 5. Wrap in IIFE
 
-#### `npx @plotpaper/cli submit ./MyApp.tsx`
+#### `npx @plotpaper/cli submit ./MyApp.tsx --email user@example.com`
 
 Submit to Plotpaper platform:
 1. Validate locally (fail fast)
-2. Parse source + schema
-3. POST to `POST /api/custom-apps/submit`
-4. Auth via API key (`~/.plotpaper/config.json` or `PLOTPAPER_API_KEY` env var)
-5. Server bundles, validates, provisions DB, stores on S3
-6. Returns app ID
+2. Parse source + schema + permissions
+3. POST to `POST /api/custom-apps/submit` with email in body
+4. Server validates, bundles, provisions DB, uploads to S3
+5. Returns app ID + credits charged
 
 ### File structure
 
@@ -121,7 +120,6 @@ packages/cli/
 │   │   ├── rewrite.ts        # Import/export rewriting
 │   │   └── wrap.ts           # IIFE wrapping
 │   └── utils/
-│       ├── config.ts         # Read ~/.plotpaper/config.json
 │       └── api.ts            # HTTP client for submission
 ├── package.json
 ├── tsconfig.json
@@ -145,43 +143,38 @@ Local Expo app that runs mini apps with a real InstantDB backend.
 
 ---
 
-## New Server Endpoint: `POST /api/custom-apps/submit`
+## Server Endpoint: `POST /api/custom-apps/submit`
 
-Accept pre-written source code from external developers.
+Accept pre-written source code from external developers. No auth header — user identified by email.
 
 ```
 Request:
 {
+  email: string,           // registered Plotpaper email
   sourceCode: string,
   name: string,
-  description: string,
+  description?: string,
   schema?: MiniAppSchema,
   permissions?: Permission[],
-  visibility: "private" | "multiplayer"
+  appMode?: "private" | "multiplayer"
 }
 
 Server flow:
-1. Authenticate via API key → resolve to userId
-2. Validate source (reuse validateSourceCode)
-3. Bundle (reuse bundleComponent)
-4. Validate bundle (reuse validateBundle)
-5. Create app record (status: "ready" immediately)
-6. Create version record
-7. Provision per-app DB if schema provided
-8. Upload to S3
-9. Return { appId, versionId }
+1. Find user by email via getUserContext()
+2. Check credit balance (half of generation cost: 250 credits)
+3. Validate source (reuse validateNativeSource)
+4. Validate schema + permissions (Zod)
+5. Bundle (reuse bundleNativeApp)
+6. Validate bundle size
+7. Upload source + bundle + schema + permissions to S3
+8. Provision per-app InstantDB if schema provided
+9. Create app + version records (status: "ready" immediately)
+10. Deduct credits
+11. Return { appId, versionId, status, creditsCharged }
 ```
 
-No Claude call, no credits for generation, no background worker needed.
-
----
-
-## API Key Auth
-
-- New entity `api_keys`: `{ key (unique, indexed), userId (indexed), name, createdAt }`
-- Users generate keys from app Settings
-- Keys hashed (SHA-256) before storage
-- CLI reads from `~/.plotpaper/config.json` or `PLOTPAPER_API_KEY` env var
+No Claude call, no background worker. Synchronous — returns 201 with ready app.
+Credits: half of generation cost (250 prod, 1 dev) since no AI calls needed.
 
 ---
 
@@ -245,11 +238,11 @@ Principle: **publish the contract, keep the implementation**.
 | **4** | `@plotpaper/cli validate` — port validation rules | Medium | DONE |
 | **5** | `@plotpaper/cli bundle` — port bundler pipeline | Medium | DONE |
 | **6** | `@plotpaper/dev-harness` — real InstantDB + mock SDK | Large | DONE |
-| **7** | `POST /api/custom-apps/submit` — server endpoint | Medium | Future |
-| **8** | `@plotpaper/cli submit` — wire up to API | Small | Future |
-| **9** | API key auth system | Medium | Future |
+| **7** | `POST /api/custom-apps/submit` — server endpoint | Medium | DONE |
+| **8** | `@plotpaper/cli submit` — wire up to API (email-based) | Small | DONE |
+| **9** | API key auth system | Medium | Deferred |
 
-Phases 1-6 complete. CLI wired for submit (Phase 8) but needs server endpoint (Phase 7) and auth (Phase 9).
+Phases 1-8 complete. API key auth (Phase 9) deferred — currently using email-based identification.
 
 ## Notes
 

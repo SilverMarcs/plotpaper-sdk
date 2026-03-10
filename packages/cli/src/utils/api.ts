@@ -6,6 +6,7 @@ import https from "https";
 import http from "http";
 
 export interface SubmitPayload {
+  email: string;
   sourceCode: string;
   name: string;
   description: string;
@@ -17,10 +18,11 @@ export interface SubmitPayload {
 export interface SubmitResult {
   appId: string;
   versionId?: string;
+  creditsCharged?: number;
 }
 
-export async function submitApp(apiKey: string, payload: SubmitPayload): Promise<SubmitResult> {
-  const apiUrl = process.env.PLOTPAPER_API_URL || "https://api.plotpaper.com";
+export async function submitApp(payload: SubmitPayload): Promise<SubmitResult> {
+  const apiUrl = process.env.PLOTPAPER_API_URL || "http://127.0.0.1:3000";
   const url = new URL("/api/custom-apps/submit", apiUrl);
 
   const body = JSON.stringify(payload);
@@ -34,7 +36,6 @@ export async function submitApp(apiKey: string, payload: SubmitPayload): Promise
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`,
           "Content-Length": Buffer.byteLength(body),
         },
       },

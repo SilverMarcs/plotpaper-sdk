@@ -6,7 +6,6 @@ import { Command } from "commander";
 import { runValidate } from "./commands/validate";
 import { runBundle } from "./commands/bundle";
 import { runSubmit } from "./commands/submit";
-import { saveConfig } from "./utils/config";
 
 const program = new Command();
 
@@ -39,30 +38,19 @@ program
 program
   .command("submit <file>")
   .description("Submit a mini app to the Plotpaper platform")
+  .requiredOption("-e, --email <email>", "Your registered Plotpaper email")
   .option("-n, --name <name>", "App name (default: filename)")
   .option("-d, --description <desc>", "App description")
   .option("-m, --mode <mode>", "App mode: private or multiplayer", "private")
   .option("-s, --schema <path>", "Path to schema.json file")
-  .action(async (file: string, options: { name?: string; description?: string; mode?: string; schema?: string }) => {
+  .action(async (file: string, options: { email: string; name?: string; description?: string; mode?: string; schema?: string }) => {
     await runSubmit(file, {
+      email: options.email,
       name: options.name,
       description: options.description,
       mode: (options.mode as "private" | "multiplayer") || "private",
       schema: options.schema,
     });
-  });
-
-// ── config ──────────────────────────────────────────────────────────────
-const configCmd = program
-  .command("config")
-  .description("Manage CLI configuration");
-
-configCmd
-  .command("set-key <key>")
-  .description("Set your Plotpaper API key")
-  .action((key: string) => {
-    saveConfig({ apiKey: key });
-    console.log("API key saved to ~/.plotpaper/config.json");
   });
 
 program.parse();
