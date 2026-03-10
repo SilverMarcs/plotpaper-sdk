@@ -106,13 +106,13 @@ const styles = StyleSheet.create({
 ## Validate your app
 
 ```bash
-plotpaper-cli validate ./my-todo/App.tsx
+plotpaper validate ./my-todo/App.tsx
 ```
 
 The CLI auto-detects `schema.json` next to the source file. You can also pass it explicitly:
 
 ```bash
-plotpaper-cli validate ./App.tsx --schema ./path/to/schema.json
+plotpaper validate ./App.tsx --schema ./path/to/schema.json
 ```
 
 This checks:
@@ -125,23 +125,17 @@ This checks:
 ## Bundle your app
 
 ```bash
-plotpaper-cli bundle ./my-todo/App.tsx
+plotpaper bundle ./my-todo/App.tsx
 ```
 
 This produces a `App.bundle.js` IIFE that's compatible with the Plotpaper runtime. Useful for inspecting what the server would generate.
 
 ## Submit your app
 
-First, set your API key:
+Submit using your registered Plotpaper email:
 
 ```bash
-plotpaper-cli config set-key <your-api-key>
-```
-
-Then submit:
-
-```bash
-plotpaper-cli submit ./my-todo/App.tsx --name "My Todo App" --description "A simple todo list"
+plotpaper submit ./my-todo/App.tsx --email you@example.com --name "My Todo App" --description "A simple todo list"
 ```
 
 ## Next steps

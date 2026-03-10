@@ -16,18 +16,17 @@ Build, validate, and submit mini apps for the [Plotpaper](https://plotpaper.com)
 # Install the CLI
 npm install -g @plotpaper/cli
 
-# Create your app (App.tsx + schema.json)
+# Create your app (App.tsx + schema.json + optional permissions.json)
 # See examples/ for reference
 
 # Validate
-plotpaper-cli validate ./my-app/App.tsx
+plotpaper validate ./my-app/App.tsx
 
 # Bundle (for inspection)
-plotpaper-cli bundle ./my-app/App.tsx
+plotpaper bundle ./my-app/App.tsx
 
-# Submit to Plotpaper
-plotpaper-cli config set-key <your-api-key>
-plotpaper-cli submit ./my-app/App.tsx --name "My App"
+# Submit to Plotpaper (uses your registered email)
+plotpaper submit ./my-app/App.tsx --email you@example.com --name "My App"
 ```
 
 ## What is a Plotpaper Mini App?

@@ -248,7 +248,7 @@ Phases 1-8 complete. API key auth (Phase 9) deferred — currently using email-b
 
 - Server uses **structured output** for schema (separate from source code, not `@schema` comments)
 - CLI uses `schema.json` file alongside source — no inline `@schema` support
-- CLI command is `plotpaper-cli` (not `plotpaper`)
+- CLI command is `plotpaper` (bin name in package.json)
 - Schema uses **array-based format** with `name` fields (matches server's `MiniAppSchemaZ` Zod schema exactly)
 - Permissions are optional — server defaults to auth-required (`auth.id != null`) for all operations
 - CLI `--schema` flag lets you point to any schema.json file explicitly
