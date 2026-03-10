@@ -22,8 +22,10 @@ export interface SubmitResult {
 }
 
 export async function submitApp(payload: SubmitPayload): Promise<SubmitResult> {
-  const apiUrl = process.env.PLOTPAPER_API_URL || "https://vd9d2wo194.execute-api.ap-southeast-1.amazonaws.com/prod";
-  const url = new URL("/api/custom-apps/submit", apiUrl);
+  const baseUrl = process.env.PLOTPAPER_API_URL || "https://vd9d2wo194.execute-api.ap-southeast-1.amazonaws.com/prod";
+  // Ensure trailing slash so new URL() doesn't strip the stage prefix (e.g. /dev, /prod)
+  const normalized = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+  const url = new URL("api/custom-apps/submit", normalized);
 
   const body = JSON.stringify(payload);
   const isHttps = url.protocol === "https:";

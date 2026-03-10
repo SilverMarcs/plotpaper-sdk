@@ -10,9 +10,9 @@ import { runSubmit } from "./commands/submit";
 const program = new Command();
 
 program
-  .name("plotpaper-cli")
+  .name("plotpaper")
   .description("CLI for building and submitting Plotpaper mini apps")
-  .version("0.1.0");
+  .version("0.2.3");
 
 // ── validate ────────────────────────────────────────────────────────────
 program
