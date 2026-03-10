@@ -40,7 +40,7 @@ export async function submitApp(payload: SubmitPayload): Promise<SubmitResult> {
         headers: {
           "Content-Type": "application/json",
           "Content-Length": Buffer.byteLength(body),
-          "X-API-Key": apiKey,
+          "Authorization": `Bearer ${apiKey}`,
         },
       },
       (res) => {
