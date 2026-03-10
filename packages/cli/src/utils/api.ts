@@ -6,7 +6,7 @@ import https from "https";
 import http from "http";
 
 export interface SubmitPayload {
-  email: string;
+  apiKey: string;
   sourceCode: string;
   name: string;
   description: string;
@@ -27,7 +27,8 @@ export async function submitApp(payload: SubmitPayload): Promise<SubmitResult> {
   const normalized = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
   const url = new URL("api/custom-apps/submit", normalized);
 
-  const body = JSON.stringify(payload);
+  const { apiKey, ...bodyPayload } = payload;
+  const body = JSON.stringify(bodyPayload);
   const isHttps = url.protocol === "https:";
   const httpModule = isHttps ? https : http;
 
@@ -39,6 +40,7 @@ export async function submitApp(payload: SubmitPayload): Promise<SubmitResult> {
         headers: {
           "Content-Type": "application/json",
           "Content-Length": Buffer.byteLength(body),
+          "Authorization": `Bearer ${apiKey}`,
         },
       },
       (res) => {

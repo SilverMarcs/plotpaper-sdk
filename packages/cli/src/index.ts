@@ -38,14 +38,14 @@ program
 program
   .command("submit <file>")
   .description("Submit a mini app to the Plotpaper platform")
-  .requiredOption("-e, --email <email>", "Your registered Plotpaper email")
+  .requiredOption("-k, --api-key <key>", "Your Plotpaper API key")
   .option("-n, --name <name>", "App name (default: filename)")
   .option("-d, --description <desc>", "App description")
   .option("-m, --mode <mode>", "App mode: private or multiplayer", "private")
   .option("-s, --schema <path>", "Path to schema.json file")
-  .action(async (file: string, options: { email: string; name?: string; description?: string; mode?: string; schema?: string }) => {
+  .action(async (file: string, options: { apiKey: string; name?: string; description?: string; mode?: string; schema?: string }) => {
     await runSubmit(file, {
-      email: options.email,
+      apiKey: options.apiKey,
       name: options.name,
       description: options.description,
       mode: (options.mode as "private" | "multiplayer") || "private",

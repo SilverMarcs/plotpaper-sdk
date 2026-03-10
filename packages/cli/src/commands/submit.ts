@@ -10,7 +10,7 @@ import { resolveSchema } from "../validation/schema";
 import { submitApp } from "../utils/api";
 
 export interface SubmitOptions {
-  email?: string;
+  apiKey?: string;
   name?: string;
   description?: string;
   mode?: "private" | "multiplayer";
@@ -25,9 +25,10 @@ export async function runSubmit(filePath: string, options: SubmitOptions): Promi
     process.exit(1);
   }
 
-  if (!options.email) {
-    console.error(chalk.red("\n  Email is required."));
-    console.error(chalk.dim("  Use --email <your-email> to specify your registered Plotpaper email."));
+  if (!options.apiKey) {
+    console.error(chalk.red("\n  API key is required."));
+    console.error(chalk.dim("  Use --api-key <key> to specify your Plotpaper API key."));
+    console.error(chalk.dim("  Generate one at Settings > Developer in the Plotpaper app."));
     process.exit(1);
   }
 
@@ -58,8 +59,7 @@ export async function runSubmit(filePath: string, options: SubmitOptions): Promi
   const schema = validation.schema?.schema;
   const permissions = validation.schema?.permissions;
 
-  console.log(chalk.dim(`\n  Email: ${options.email}`));
-  console.log(chalk.dim(`  Name: ${name}`));
+  console.log(chalk.dim(`\n  Name: ${name}`));
   console.log(chalk.dim(`  Mode: ${appMode}`));
   if (schema) {
     console.log(chalk.dim(`  Schema: ${schema.entities.length} entities`));
@@ -70,7 +70,7 @@ export async function runSubmit(filePath: string, options: SubmitOptions): Promi
 
   try {
     const result = await submitApp({
-      email: options.email,
+      apiKey: options.apiKey,
       sourceCode: source,
       name,
       description,
