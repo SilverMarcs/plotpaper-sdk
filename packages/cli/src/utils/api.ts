@@ -22,7 +22,7 @@ export interface SubmitResult {
 }
 
 export async function submitApp(payload: SubmitPayload): Promise<SubmitResult> {
-  const apiUrl = process.env.PLOTPAPER_API_URL || "http://127.0.0.1:3000";
+  const apiUrl = process.env.PLOTPAPER_API_URL || "https://vd9d2wo194.execute-api.ap-southeast-1.amazonaws.com/prod";
   const url = new URL("/api/custom-apps/submit", apiUrl);
 
   const body = JSON.stringify(payload);
