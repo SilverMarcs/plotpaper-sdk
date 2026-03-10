@@ -1,6 +1,6 @@
 {
   "name": "@plotpaper/cli",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "CLI for validating, bundling, and submitting Plotpaper mini apps",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

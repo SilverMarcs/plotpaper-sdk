@@ -12,7 +12,7 @@ const program = new Command();
 program
   .name("plotpaper")
   .description("CLI for building and submitting Plotpaper mini apps")
-  .version("0.2.4");
+  .version("0.2.5");
 
 // ── validate ────────────────────────────────────────────────────────────
 program
