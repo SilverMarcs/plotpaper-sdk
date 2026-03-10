@@ -61,7 +61,7 @@ npm install
 
 1. Set your InstantDB app ID in `plotpaper.config.ts`
 2. Copy your app code into `src/App.tsx`
-3. Run `npm run ios` or `npm run android`
+3. Run `npm run web`
 
 The dev harness provides:
 - **Real database** — full InstantDB with live subscriptions

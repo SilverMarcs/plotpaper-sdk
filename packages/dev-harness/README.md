@@ -19,9 +19,7 @@ Local development environment for building Plotpaper mini apps with hot reload.
 
 5. Start the dev server:
    ```bash
-   npm run ios
-   # or
-   npm run android
+   npm run web
    ```
 
 ## How it works
