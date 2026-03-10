@@ -50,6 +50,27 @@ A single-file React Native component that runs inside the Plotpaper platform. Ea
 
 See [Security Model](./docs/security-model.md) for full details.
 
+## Local Development (Dev Harness)
+
+Test your mini app locally with a real database and hot reload:
+
+```bash
+cd packages/dev-harness
+npm install
+```
+
+1. Set your InstantDB app ID in `plotpaper.config.ts`
+2. Copy your app code into `src/App.tsx`
+3. Run `npm run ios` or `npm run android`
+
+The dev harness provides:
+- **Real database** — full InstantDB with live subscriptions
+- **Theme toggle** — switch light/dark mode from the Dev Tools panel
+- **Mock AI/credits/notifications** — test UI flows without burning credits
+- **SDK call logging** — see every SDK call with timestamps
+
+See [dev-harness README](./packages/dev-harness/README.md) for full details.
+
 ## Documentation
 
 - [Getting Started](./docs/getting-started.md)

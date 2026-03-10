@@ -7,7 +7,7 @@
 
 export default {
   /** Your InstantDB app ID (from https://instantdb.com/dash) */
-  instantdbAppId: "",
+  instantdbAppId: "65cf50d1-ed04-4ee4-b3b8-e436ac76091a",
 
   /** Mock user info returned by sdk.getUserInfo() */
   user: {

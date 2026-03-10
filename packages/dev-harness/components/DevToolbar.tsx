@@ -125,8 +125,8 @@ export default function DevToolbar() {
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
-    top: 54,
-    right: 12,
+    bottom: 12,
+    left: 12,
     width: 36,
     height: 36,
     borderRadius: 18,
