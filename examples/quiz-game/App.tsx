@@ -8,15 +8,15 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { usePlotpaperSDK } from "@plotpaper/mini-app-sdk";
-import Feather from "@expo/vector-icons/Feather";
+import { CheckCircle, XCircle } from "lucide-react-native";
 
 const TOPICS = [
-  { label: "Science", icon: "zap", emoji: "🔬" },
-  { label: "History", icon: "book", emoji: "📜" },
-  { label: "Geography", icon: "globe", emoji: "🌍" },
-  { label: "Sports", icon: "activity", emoji: "⚽" },
-  { label: "Movies", icon: "film", emoji: "🎬" },
-  { label: "Music", icon: "headphones", emoji: "🎵" },
+  { label: "Science", emoji: "🔬" },
+  { label: "History", emoji: "📜" },
+  { label: "Geography", emoji: "🌍" },
+  { label: "Sports", emoji: "⚽" },
+  { label: "Movies", emoji: "🎬" },
+  { label: "Music", emoji: "🎵" },
 ];
 
 export default function QuizGame() {
@@ -80,7 +80,6 @@ export default function QuizGame() {
   const nextQuestion = () => {
     if (currentQ + 1 >= activeQuiz.questions.length) {
       // Quiz finished — save result
-      const finalScore = score + (selected === activeQuiz.questions[currentQ].correctIndex ? 0 : 0); // score already updated
       sdk.db.transact(sdk.db.tx.quizzes[sdk.db.id()].update({
         topic: activeQuiz.topic,
         questions: activeQuiz.questions,
@@ -129,8 +128,8 @@ export default function QuizGame() {
               onPress={() => selectAnswer(i)}
             >
               <Text style={[styles.optionText, { color: colors.foreground }]}>{opt}</Text>
-              {answered && i === q.correctIndex && <Feather name="check-circle" size={20} color={colors.success} />}
-              {answered && i === selected && i !== q.correctIndex && <Feather name="x-circle" size={20} color={colors.destructive} />}
+              {answered && i === q.correctIndex && <CheckCircle size={20} color={colors.success} />}
+              {answered && i === selected && i !== q.correctIndex && <XCircle size={20} color={colors.destructive} />}
             </Pressable>
           );
         })}

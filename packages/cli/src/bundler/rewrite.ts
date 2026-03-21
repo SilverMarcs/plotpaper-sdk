@@ -6,9 +6,10 @@ const SHARED_MODULES = [
   "react",
   "react-native",
   "@plotpaper/mini-app-sdk",
-  "@expo/vector-icons/Feather",
+  "lucide-react-native",
   "react-native-svg",
   "react-native-safe-area-context",
+  "@plotpaper/ui",
 ];
 
 /**

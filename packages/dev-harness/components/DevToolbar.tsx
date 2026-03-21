@@ -11,7 +11,7 @@ import {
   Modal,
   StyleSheet,
 } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { Wrench, X, Sun, Moon } from "lucide-react-native";
 import { useDevHarness } from "../mini-app-sdk/context";
 
 export default function DevToolbar() {
@@ -30,7 +30,7 @@ export default function DevToolbar() {
         style={[styles.fab, { backgroundColor: isDark ? "#333" : "#eee", borderColor: border }]}
         onPress={() => setShowPanel(true)}
       >
-        <Feather name="tool" size={18} color={fg} />
+        <Wrench size={18} color={fg} />
       </Pressable>
 
       {/* Panel modal */}
@@ -39,7 +39,7 @@ export default function DevToolbar() {
           <View style={[styles.panelHeader, { borderBottomColor: border }]}>
             <Text style={[styles.panelTitle, { color: fg }]}>Dev Tools</Text>
             <Pressable onPress={() => setShowPanel(false)}>
-              <Feather name="x" size={24} color={fg} />
+              <X size={24} color={fg} />
             </Pressable>
           </View>
 
@@ -48,7 +48,7 @@ export default function DevToolbar() {
             <View style={[styles.section, { borderBottomColor: border }]}>
               <Text style={[styles.sectionTitle, { color: fg }]}>Theme</Text>
               <Pressable style={[styles.button, { backgroundColor: isDark ? "#444" : "#f0f0f0" }]} onPress={toggleDark}>
-                <Feather name={isDark ? "sun" : "moon"} size={16} color={fg} />
+                {isDark ? <Sun size={16} color={fg} /> : <Moon size={16} color={fg} />}
                 <Text style={{ color: fg, marginLeft: 8 }}>
                   {isDark ? "Switch to Light" : "Switch to Dark"}
                 </Text>

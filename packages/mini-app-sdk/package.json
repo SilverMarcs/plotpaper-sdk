@@ -20,18 +20,18 @@
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-native": ">=0.72.0",
-    "@expo/vector-icons": ">=14.0.0"
+    "lucide-react-native": ">=0.300.0"
   },
   "peerDependenciesMeta": {
     "react-native": {
       "optional": true
     },
-    "@expo/vector-icons": {
+    "lucide-react-native": {
       "optional": true
     }
   },
   "devDependencies": {
-    "@expo/vector-icons": "^15.0.0",
+    "lucide-react-native": "^0.577.0",
     "@types/react": "^18.2.0",
     "react": "^18.2.0",
     "react-native": "^0.76.0",

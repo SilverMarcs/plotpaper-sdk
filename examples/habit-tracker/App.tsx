@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { usePlotpaperSDK } from "@plotpaper/mini-app-sdk";
-import Feather from "@expo/vector-icons/Feather";
+import { Check, Plus } from "lucide-react-native";
 import Svg, { Circle } from "react-native-svg";
 
 const COLORS = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#98D8C8", "#F7DC6F"];
@@ -120,7 +120,7 @@ export default function HabitTracker() {
             <Text style={[styles.habitName, { color: done ? colors.foreground : colors.mutedForeground }]}>
               {habit.name}
             </Text>
-            {done && <Feather name="check" size={20} color={habit.color} />}
+            {done && <Check size={20} color={habit.color} />}
           </Pressable>
         );
       })}
@@ -156,7 +156,7 @@ export default function HabitTracker() {
         </View>
       ) : (
         <Pressable style={[styles.addBtn, { borderColor: colors.border }]} onPress={() => setShowAdd(true)}>
-          <Feather name="plus" size={20} color={colors.mutedForeground} />
+          <Plus size={20} color={colors.mutedForeground} />
           <Text style={{ color: colors.mutedForeground }}>Add habit</Text>
         </Pressable>
       )}

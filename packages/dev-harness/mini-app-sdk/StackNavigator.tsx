@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { ArrowLeft } from "lucide-react-native";
 
 interface ScreenConfig {
   title: string;
@@ -59,9 +59,12 @@ export default function StackNavigator({
           ]}
         >
           {stack.length > 1 ? (
-            <TouchableOpacity style={styles.backButton} onPress={pop} activeOpacity={0.7}>
-              <Feather name="arrow-left" size={22} color={colors.primary} />
-            </TouchableOpacity>
+            <Pressable
+              style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
+              onPress={pop}
+            >
+              <ArrowLeft size={22} color={colors.primary} />
+            </Pressable>
           ) : (
             <View style={styles.backPlaceholder} />
           )}

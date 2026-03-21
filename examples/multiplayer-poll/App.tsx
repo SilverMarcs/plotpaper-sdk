@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { usePlotpaperSDK } from "@plotpaper/mini-app-sdk";
-import Feather from "@expo/vector-icons/Feather";
+import { Plus, X, BarChart2 } from "lucide-react-native";
 
 export default function MultiplayerPoll() {
   const sdk = usePlotpaperSDK();
@@ -100,7 +100,7 @@ export default function MultiplayerPoll() {
               />
               {options.length > 2 && (
                 <Pressable onPress={() => setOptions(options.filter((_, j) => j !== i))}>
-                  <Feather name="x" size={20} color={colors.destructive} />
+                  <X size={20} color={colors.destructive} />
                 </Pressable>
               )}
             </View>
@@ -121,7 +121,7 @@ export default function MultiplayerPoll() {
         </View>
       ) : (
         <Pressable style={[styles.newPollBtn, { backgroundColor: colors.primary }]} onPress={() => setShowCreate(true)}>
-          <Feather name="plus" size={20} color={colors.primaryForeground} />
+          <Plus size={20} color={colors.primaryForeground} />
           <Text style={{ color: colors.primaryForeground, fontWeight: "600", fontSize: 16 }}>New Poll</Text>
         </Pressable>
       )}
@@ -166,7 +166,7 @@ export default function MultiplayerPoll() {
 
       {polls.length === 0 && (
         <View style={styles.emptyState}>
-          <Feather name="bar-chart-2" size={48} color={colors.mutedForeground} />
+          <BarChart2 size={48} color={colors.mutedForeground} />
           <Text style={{ color: colors.mutedForeground, marginTop: 12, fontSize: 16 }}>No polls yet</Text>
           <Text style={{ color: colors.mutedForeground, fontSize: 14 }}>Create the first one!</Text>
         </View>

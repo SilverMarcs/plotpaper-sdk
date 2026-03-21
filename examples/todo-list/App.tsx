@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { usePlotpaperSDK } from "@plotpaper/mini-app-sdk";
-import Feather from "@expo/vector-icons/Feather";
+import { Plus, CheckCircle, Circle, Trash2 } from "lucide-react-native";
 
 export default function TodoList() {
   const sdk = usePlotpaperSDK();
@@ -68,7 +68,7 @@ export default function TodoList() {
           style={[styles.addButton, { backgroundColor: colors.primary }]}
           onPress={addTodo}
         >
-          <Feather name="plus" size={22} color={colors.primaryForeground} />
+          <Plus size={22} color={colors.primaryForeground} />
         </Pressable>
       </View>
 
@@ -79,11 +79,11 @@ export default function TodoList() {
         renderItem={({ item }) => (
           <View style={[styles.todoRow, { borderBottomColor: colors.border }]}>
             <Pressable style={styles.checkbox} onPress={() => toggleTodo(item.id, item.done)}>
-              <Feather
-                name={item.done ? "check-circle" : "circle"}
-                size={22}
-                color={item.done ? colors.success : colors.mutedForeground}
-              />
+              {item.done ? (
+                <CheckCircle size={22} color={colors.success} />
+              ) : (
+                <Circle size={22} color={colors.mutedForeground} />
+              )}
             </Pressable>
             <Text
               style={[
@@ -97,7 +97,7 @@ export default function TodoList() {
               {item.title}
             </Text>
             <Pressable onPress={() => deleteTodo(item.id)} hitSlop={8}>
-              <Feather name="trash-2" size={18} color={colors.destructive} />
+              <Trash2 size={18} color={colors.destructive} />
             </Pressable>
           </View>
         )}

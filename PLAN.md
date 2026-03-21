@@ -73,7 +73,7 @@ Runs all checks from `validation.ts` locally:
 
 1. **Size check** — source < 50KB
 2. **Default export check** — must have `export default`
-3. **Allowed imports** — only: `react`, `react-native`, `@plotpaper/mini-app-sdk`, `@expo/vector-icons/Feather`, `react-native-svg`, `react-native-safe-area-context`
+3. **Allowed imports** — only: `react`, `react-native`, `@plotpaper/mini-app-sdk`, `lucide-react-native`, `react-native-svg`, `react-native-safe-area-context`
 4. **Blocked patterns** (15 patterns):
    - `fetch`, `XMLHttpRequest`, `eval`, `Function(`, `AsyncStorage`, `Linking`, `NativeModules`
    - `constructor.constructor`, `.__proto__`, `Object.getPrototypeOf()`
@@ -200,7 +200,7 @@ docs/
 ├── getting-started.md          # Install CLI, create first app, submit
 ├── sdk-reference.md            # Full API reference (from sdk-docs.ts)
 ├── schema-guide.md             # Schemas, value types, links, permissions
-├── components.md               # RN components, Feather icons, SVG, safe area
+├── components.md               # RN components, Lucide icons, UI components, SVG, safe area
 ├── navigation.md               # TabNavigator + StackNavigator
 ├── security-model.md           # What's blocked and why
 ├── feed-actions.md             # Static, template, buttons

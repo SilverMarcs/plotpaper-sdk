@@ -44,7 +44,7 @@ A single-file React Native component that runs inside the Plotpaper platform. Ea
 
 - Single file, single default export
 - Max 50KB source code
-- Only allowed imports: `react`, `react-native`, `@plotpaper/mini-app-sdk`, `@expo/vector-icons/Feather`, `react-native-svg`, `react-native-safe-area-context`
+- Only allowed imports: `react`, `react-native`, `@plotpaper/mini-app-sdk`, `lucide-react-native`, `react-native-svg`, `react-native-safe-area-context`, `@plotpaper/ui`
 - No network requests (`fetch`, `XMLHttpRequest`)
 - No native module access
 

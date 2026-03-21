@@ -7,8 +7,8 @@ import type { SDKTheme } from "./theme";
 export interface TabConfig {
   key: string;
   title: string;
-  /** Feather icon name */
-  icon: string;
+  /** Lucide icon component — e.g. `Home` from lucide-react-native */
+  icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
   /** React component to render for this tab */
   screen: any;
   badge?: string | number;

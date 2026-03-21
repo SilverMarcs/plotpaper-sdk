@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { ArrowLeft } from "lucide-react-native";
 import type {
   SDKTheme,
   ScreenConfig,
@@ -77,13 +78,15 @@ export default function StackNavigator({
           ]}
         >
           {stack.length > 1 ? (
-            <TouchableOpacity
-              style={styles.backButton}
+            <Pressable
+              style={({ pressed }) => [
+                styles.backButton,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={pop}
-              activeOpacity={0.7}
             >
-              <Text style={{ color: colors.primary, fontSize: 22 }}>←</Text>
-            </TouchableOpacity>
+              <ArrowLeft size={22} color={colors.primary} />
+            </Pressable>
           ) : (
             <View style={styles.backPlaceholder} />
           )}

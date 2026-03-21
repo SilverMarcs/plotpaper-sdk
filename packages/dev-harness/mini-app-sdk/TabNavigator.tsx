@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, StyleSheet, Platform } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface TabConfig {
   key: string;
   title: string;
-  icon: string;
+  icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
   screen: React.ComponentType<any>;
   badge?: string | number;
 }
@@ -61,6 +60,7 @@ export default function TabNavigator({
       >
         {tabs.map((tab) => {
           const isActive = tab.key === activeTab;
+          const IconComponent = tab.icon;
           return (
             <Pressable
               key={tab.key}
@@ -68,10 +68,10 @@ export default function TabNavigator({
               style={({ pressed }) => [styles.tabButton, pressed && styles.tabButtonPressed]}
             >
               <View style={styles.tabIconContainer}>
-                <Feather
-                  name={tab.icon as any}
+                <IconComponent
                   size={22}
                   color={isActive ? colors.primary : colors.mutedForeground}
+                  strokeWidth={isActive ? 2.5 : 1.5}
                 />
                 {tab.badge != null && (
                   <View style={[styles.badge, { backgroundColor: colors.destructive }]}>

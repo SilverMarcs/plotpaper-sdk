@@ -10,22 +10,37 @@ Import from `react-native`:
 **Display:** `Image`, `Modal`, `ActivityIndicator`
 **Utility:** `StyleSheet`, `Dimensions`, `Alert`, `Animated`, `Platform`, `KeyboardAvoidingView`
 
-## Feather Icons
+## Lucide Icons
 
 ```tsx
-import Feather from "@expo/vector-icons/Feather";
+import { Check, Plus, Trash2, ArrowLeft } from "lucide-react-native";
 
-<Feather name="check" size={24} color={colors.primary} />
+<Check size={24} color={colors.primary} />
+<Plus size={20} color={colors.primaryForeground} />
+<Trash2 size={18} color={colors.destructive} strokeWidth={1.5} />
 ```
 
-Props: `name` (string, required), `size` (number, default 24), `color` (string).
+Props: `size` (number, default 24), `color` (string), `strokeWidth` (number, default 2).
 
-<details>
-<summary>All available icon names</summary>
+Icons are imported as individual components from `lucide-react-native`. Browse all icons at [lucide.dev/icons](https://lucide.dev/icons).
 
-check, x, plus, minus, edit-2, trash-2, heart, star, settings, search, home, user, bell, calendar, clock, arrow-left, arrow-right, chevron-down, chevron-up, chevron-right, share, copy, download, upload, refresh-cw, eye, eye-off, lock, unlock, mail, phone, map-pin, camera, image, mic, play, pause, volume-2, wifi, bluetooth, battery, sun, moon, cloud, zap, award, gift, bookmark, flag, tag, folder, file, file-text, grid, list, layers, filter, sliders, bar-chart-2, trending-up, trending-down, activity, target, alert-circle, info, help-circle, check-circle, x-circle, alert-triangle, more-horizontal, more-vertical, menu, external-link, link, rotate-cw, rotate-ccw, save, send, scissors, maximize, minimize, move, circle, square, triangle, octagon, hash, at-sign, percent, dollar-sign, credit-card, shopping-cart, shopping-bag, package, truck, map, compass, navigation, globe, crosshair, wind, droplet, thermometer, umbrella, coffee, book, book-open, feather, pen-tool, type, bold, italic, underline, align-left, align-center, align-right, columns, sidebar, layout, monitor, smartphone, tablet, watch, tv, speaker, headphones, radio, film, video, aperture, log-in, log-out, power, repeat, skip-back, skip-forward, rewind, fast-forward, voicemail, inbox, archive, paperclip, printer, server, database, hard-drive, cpu, terminal, code, git-branch, git-commit, git-merge, git-pull-request, github, gitlab, chrome, figma, codepen, codesandbox, slack, twitter, facebook, instagram, linkedin, youtube, twitch, airplay, cast
+## Plotpaper UI Components
 
-</details>
+Pre-styled components from `@plotpaper/ui` — built with Tailwind, themed automatically:
+
+```tsx
+import { Text, Button, Card, CardHeader, CardTitle, CardContent, Input, Badge, Icon } from "@plotpaper/ui";
+```
+
+**Typography:** `Text`
+**Buttons:** `Button`
+**Cards:** `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`
+**Form inputs:** `Input`, `Textarea`, `Label`, `Checkbox`, `Switch`, `RadioGroup`, `RadioGroupItem`
+**Data display:** `Badge`, `Avatar`, `AvatarImage`, `AvatarFallback`, `Separator`, `Progress`, `Skeleton`
+**Layout:** `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionContent`
+**Feedback:** `Alert`, `AlertTitle`, `AlertDescription`, `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`, `DialogClose`
+**Icons:** `Icon` — wrapper for Lucide icons with Tailwind `className` support
+**Layout:** `SafeAreaView`
 
 ## SVG Graphics
 

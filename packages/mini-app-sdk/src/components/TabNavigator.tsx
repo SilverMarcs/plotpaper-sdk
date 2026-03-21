@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, StyleSheet, Platform } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
 import type {
   SDKTheme,
   TabConfig,
@@ -16,10 +15,12 @@ export type { TabConfig, TabNavigatorProps, TabNavigation };
  * Each tab renders its `screen` component with `sdk` and `navigation` props.
  *
  * ```tsx
+ * import { Home, Settings } from "lucide-react-native";
+ *
  * <TabNavigator
  *   tabs={[
- *     { key: "home", title: "Home", icon: "home", screen: HomeScreen },
- *     { key: "settings", title: "Settings", icon: "settings", screen: SettingsScreen },
+ *     { key: "home", title: "Home", icon: Home, screen: HomeScreen },
+ *     { key: "settings", title: "Settings", icon: Settings, screen: SettingsScreen },
  *   ]}
  *   theme={sdk.theme}
  *   sdk={sdk}
@@ -68,6 +69,7 @@ export default function TabNavigator({
       >
         {tabs.map((tab) => {
           const isActive = tab.key === activeTab;
+          const IconComponent = tab.icon;
           return (
             <Pressable
               key={tab.key}
@@ -78,10 +80,10 @@ export default function TabNavigator({
               ]}
             >
               <View style={styles.tabIconContainer}>
-                <Feather
-                  name={tab.icon as any}
+                <IconComponent
                   size={22}
                   color={isActive ? colors.primary : colors.mutedForeground}
+                  strokeWidth={isActive ? 2.5 : 1.5}
                 />
                 {tab.badge != null && (
                   <View
