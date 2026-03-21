@@ -46,10 +46,14 @@ export interface StackNavigatorProps {
 }
 
 export interface StackNavigation {
+  navigate: (name: string, params?: Record<string, any>) => void;
   push: (name: string, params?: Record<string, any>) => void;
-  pop: () => void;
-  popToRoot: () => void;
+  goBack: () => void;
+  pop: (count?: number) => void;
+  popToTop: () => void;
   canGoBack: () => boolean;
+  replace: (name: string, params?: Record<string, any>) => void;
+  setParams: (params: Record<string, any>) => void;
 }
 
 export interface StackRoute {

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
 import type {
@@ -18,6 +18,7 @@ interface StackEntry {
 
 /**
  * Stack-based navigation component for mini apps.
+ * Follows the React Navigation stack navigator API.
  *
  * Each screen receives `sdk`, `navigation`, and `route` props.
  *
@@ -46,24 +47,54 @@ export default function StackNavigator({
   const currentEntry = stack[stack.length - 1];
   const currentConfig = screens[currentEntry.name];
 
-  const push = useCallback(
-    (name: string, params?: Record<string, any>) => {
-      setStack((prev) => [...prev, { name, params }]);
-    },
-    []
-  );
+  const navigate = useCallback((name: string, params?: Record<string, any>) => {
+    setStack((prev) => {
+      const idx = prev.findIndex((e) => e.name === name);
+      if (idx >= 0) {
+        const sliced = prev.slice(0, idx + 1);
+        sliced[idx] = { name, params: params ?? sliced[idx].params };
+        return sliced;
+      }
+      return [...prev, { name, params }];
+    });
+  }, []);
 
-  const pop = useCallback(() => {
+  const push = useCallback((name: string, params?: Record<string, any>) => {
+    setStack((prev) => [...prev, { name, params }]);
+  }, []);
+
+  const goBack = useCallback(() => {
     setStack((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev));
   }, []);
 
-  const popToRoot = useCallback(() => {
+  const pop = useCallback((count: number = 1) => {
+    setStack((prev) => {
+      const next = prev.slice(0, Math.max(1, prev.length - count));
+      return next.length === prev.length ? prev : next;
+    });
+  }, []);
+
+  const popToTop = useCallback(() => {
     setStack((prev) => [prev[0]]);
   }, []);
 
   const canGoBack = useCallback(() => stack.length > 1, [stack.length]);
 
-  const navigation: StackNavigation = { push, pop, popToRoot, canGoBack };
+  const replace = useCallback((name: string, params?: Record<string, any>) => {
+    setStack((prev) => [...prev.slice(0, -1), { name, params }]);
+  }, []);
+
+  const setParams = useCallback((params: Record<string, any>) => {
+    setStack((prev) => {
+      const last = prev[prev.length - 1];
+      return [...prev.slice(0, -1), { ...last, params: { ...last.params, ...params } }];
+    });
+  }, []);
+
+  const navigation: StackNavigation = useMemo(
+    () => ({ navigate, push, goBack, pop, popToTop, canGoBack, replace, setParams }),
+    [navigate, push, goBack, pop, popToTop, canGoBack, replace, setParams],
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -83,7 +114,7 @@ export default function StackNavigator({
                 styles.backButton,
                 pressed && { opacity: 0.7 },
               ]}
-              onPress={pop}
+              onPress={goBack}
             >
               <ArrowLeft size={22} color={colors.primary} />
             </Pressable>

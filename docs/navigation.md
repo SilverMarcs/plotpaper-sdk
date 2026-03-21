@@ -63,7 +63,7 @@ Each screen receives: `{ sdk, navigation: { navigate(key), currentTab } }`
 
 ## StackNavigator
 
-Push/pop navigation with a header bar.
+Stack-based navigation with a header bar. Follows the React Navigation stack navigator API.
 
 ```tsx
 function ListScreen({ sdk, navigation }) {
@@ -71,7 +71,7 @@ function ListScreen({ sdk, navigation }) {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: sdk.theme.colors.background }}>
       {items.map((item, i) => (
-        <Pressable key={i} onPress={() => navigation.push("detail", { item })}>
+        <Pressable key={i} onPress={() => navigation.navigate("detail", { item })}>
           <Text style={{ color: sdk.theme.colors.foreground }}>{item}</Text>
         </Pressable>
       ))}
@@ -79,11 +79,14 @@ function ListScreen({ sdk, navigation }) {
   );
 }
 
-function DetailScreen({ sdk, route }) {
+function DetailScreen({ sdk, navigation, route }) {
   const item = route.params?.item ?? "Unknown";
   return (
     <View style={{ flex: 1, backgroundColor: sdk.theme.colors.background }}>
       <Text style={{ color: sdk.theme.colors.foreground, fontSize: 24 }}>{item}</Text>
+      <Pressable onPress={() => navigation.goBack()}>
+        <Text style={{ color: sdk.theme.colors.primary }}>Go Back</Text>
+      </Pressable>
     </View>
   );
 }
@@ -108,7 +111,20 @@ export default function MyApp() {
 | `sdk` | any | No | | Passed to each screen as props |
 | `showHeader` | boolean | No | `true` | Show/hide the header bar |
 
-Each screen receives: `{ sdk, navigation: { push, pop, popToRoot, canGoBack }, route: { name, params } }`
+Each screen receives: `{ sdk, navigation, route: { name, params } }`
+
+### Navigation methods
+
+| Method | Description |
+|--------|-------------|
+| `navigate(name, params?)` | If screen exists in stack, pops back to it. Otherwise pushes new screen. |
+| `push(name, params?)` | Always pushes a new screen onto the stack. |
+| `goBack()` | Go back one screen. |
+| `pop(count?)` | Go back by `count` screens (default 1). |
+| `popToTop()` | Go back to the first screen. |
+| `canGoBack()` | Returns true if there are screens to go back to. |
+| `replace(name, params?)` | Replace the current screen without adding to the stack. |
+| `setParams(params)` | Merge params into the current screen's route params. |
 
 ## Nested Navigation
 
